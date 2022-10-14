@@ -199,9 +199,10 @@ class Simulation:
 
         if self.initial_run:
             self.btn_start['text'] = 'Continue'
+            self.spn_num_people.config(state='disabled')
+            self.spn_number_of_infected.config(state='disabled')
         
         self.step(days_to_sim)
-
 
 if __name__ == '__main__':
     simulation = Simulation()
