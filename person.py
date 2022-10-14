@@ -7,7 +7,7 @@ class Person:
         self.location = None
 
         self.infectivity = 0
-        self.succeptibility = 0
+        self.susceptibility = 0
 
     def infect(self):
         self.is_infected = True
@@ -20,10 +20,10 @@ class Person:
         self.infectivity = virus_infection_rate * prevention_measures
         return self.infectivity
 
-    def calculate_succeptibility(self, virus_infectivity):
+    def calculate_susceptibility(self, virus_infectivity):
         prevention_measures = 1
         if self.is_masked:
             prevention_measures *= 0.1
         
-        self.succeptibility = virus_infectivity * prevention_measures
-        return self.succeptibility
+        self.susceptibility = virus_infectivity * prevention_measures
+        return self.susceptibility

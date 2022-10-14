@@ -5,18 +5,10 @@ import matplotlib.pyplot as plt
 from person import Person
 from location import Location
 import random
+from ruleset import rules
 
 class Simulation:
     def __init__(self):
-        #tell mpl to use the tk backend to show figures in the tk window
-        self.settings = {
-            'max people': 1000,
-            'number of locations': 3,
-            'max people per room': None,
-            'mask mandates' : False,
-            'virus infectivity': 0.05,
-        }
-
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
         self.WINDOW.geometry('500x500+400+400')
@@ -57,17 +49,16 @@ class Simulation:
     def create_widgets(self, widget_type):
         if widget_type == 'settings':   
             self.lbl_spn_num_people = ttk.Label(self.settings_frame, text='Number of people')
-            self.spn_num_people = ttk.Spinbox(self.settings_frame, from_=1, to=self.settings['max people'])
+            self.spn_num_people = ttk.Spinbox(self.settings_frame, from_=1, to=rules['max people'])
 
             self.lbl_number_of_infected = ttk.Label(self.settings_frame, text='Number of infected')
-            self.spn_number_of_infected = ttk.Spinbox(self.settings_frame, from_=1, to=self.settings['max people'])
+            self.spn_number_of_infected = ttk.Spinbox(self.settings_frame, from_=1, to=rules['max people'])
 
-            self.btn_start = ttk.Button(self.WINDOW, text='Start', command=lambda: self.start())
+
             
             settings_widgets = [
                 self.lbl_spn_num_people, self.spn_num_people,
                 self.lbl_number_of_infected, self.spn_number_of_infected,
-                self.btn_start,
             ]
 
             return settings_widgets
@@ -78,10 +69,12 @@ class Simulation:
 
             self.btn_show_data = ttk.Button(self.action_frame, text='Show data', command=lambda: self.show_data())
 
+            self.btn_start = ttk.Button(self.action_frame, text='Start', command=lambda: self.start())
+
             action_widgets = [
                 self.lbl_spn_days_to_sim, self.spn_days_to_sim,
                 self.btn_show_data,
-
+                self.btn_start,
             ]
             
             return action_widgets
@@ -109,16 +102,16 @@ class Simulation:
                 ''')
 
     def calculate_infection_chance(self, person, location_infection_chance, virus_infectivity):
-        succeptibility = person.calculate_succeptibility(virus_infectivity)
+        susceptibility = person.calculate_susceptibility(virus_infectivity)
 
-        chance = location_infection_chance * succeptibility
+        chance = location_infection_chance * susceptibility
         return chance
 
     def step(self, steps):
         self.initial_run = False
 
         for _ in range(1, steps + 1):    
-            num_locations = self.settings['number of locations']
+            num_locations = rules['number of locations']
             locations_list = []
 
             for _ in range(0, num_locations):
@@ -128,7 +121,7 @@ class Simulation:
                 location_index = random.randint(0, num_locations -1)
                 locations_list[location_index].add_person(person)
                 person.location = location_index
-                print(f'assigning person to location {location_index}')
+                #print(f'assigning person to location {location_index}')
 
             print(f'''There are {len(self.people)} total people, of which:''')
 
@@ -136,13 +129,13 @@ class Simulation:
                 print(f'{len(locations_list[_].people)} are in location {_}')
 
             for location in locations_list:
-                location.calculate_total_infection_chance(self.settings['virus infectivity'])
+                location.calculate_total_infection_chance(rules['virus infectivity'])
                 # print(f'There are {len(location.infected_people)} infected people in location {locations_list.index(location)}')
 
             for location in locations_list:
                 for person in location.people:
                     if not person.is_infected:            
-                        person.chance_of_infection = self.calculate_infection_chance(person, location.total_location_infection_chance, self.settings['virus infectivity'])
+                        person.chance_of_infection = self.calculate_infection_chance(person, location.total_location_infection_chance, rules['virus infectivity'])
                         """
                         print(f'''Person:
                         Location: {person.location}
