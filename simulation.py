@@ -6,6 +6,7 @@ from person import Person
 from location import Location
 import random
 from ruleset import rules
+import math
 
 class Simulation:
     def __init__(self):
@@ -53,8 +54,6 @@ class Simulation:
 
             self.lbl_number_of_infected = ttk.Label(self.settings_frame, text='Number of infected')
             self.spn_number_of_infected = ttk.Spinbox(self.settings_frame, from_=1, to=rules['max people'])
-
-
             
             settings_widgets = [
                 self.lbl_spn_num_people, self.spn_num_people,
@@ -101,10 +100,8 @@ class Simulation:
                 {remedy}
                 ''')
 
-    def calculate_infection_chance(self, person, location_infection_chance, virus_infectivity):
-        susceptibility = person.calculate_susceptibility(virus_infectivity)
-
-        chance = location_infection_chance * susceptibility
+    def calculate_chance_of_infection(self, person, location):
+        chance = float(person.susceptibility * location.infectivity * 100)
         return chance
 
     def step(self, steps):
@@ -123,32 +120,25 @@ class Simulation:
                 person.location = location_index
                 #print(f'assigning person to location {location_index}')
 
-            print(f'''There are {len(self.people)} total people, of which:''')
+            #print(f'''There are {len(self.people)} total people, of which:''')
 
-            for _ in range(0, len(locations_list)):
-                print(f'{len(locations_list[_].people)} are in location {_}')
+            #for _ in range(0, len(locations_list)):
+              #  print(f'{len(locations_list[_].people)} are in location {_}')
+                
+            for person in self.people:
+                person.calculate_infectivity(rules)
+                person.calculate_susceptibility(rules)
 
             for location in locations_list:
-                location.calculate_total_infection_chance(rules['virus infectivity'])
-                # print(f'There are {len(location.infected_people)} infected people in location {locations_list.index(location)}')
+                location.calculate_infectivity()
 
             for location in locations_list:
                 for person in location.people:
-                    if not person.is_infected:            
-                        person.chance_of_infection = self.calculate_infection_chance(person, location.total_location_infection_chance, rules['virus infectivity'])
-                        """
-                        print(f'''Person:
-                        Location: {person.location}
-                        Vaccinated: {person.is_vaccinated}
-                        Infected: {person.is_vaccinated}
-
-                        Chance of infection: {person.chance_of_infection}
-                        
-                        ''')
-                        """
-                        if random.randint(0, 100) <= (100* person.chance_of_infection):
+                    if person.susceptibility > 0:
+                        chance_of_infection = self.calculate_chance_of_infection(person, location)
+                        if random.randint(1, 100) <= chance_of_infection:
                             person.infect()
-                            print(f'person at location location {person.location} infected!')
+                    else: pass
             
             total_infected = 0
             for person in self.people:
@@ -158,9 +148,10 @@ class Simulation:
             print(f'{total_infected}/{len(self.people)} are infected.')
 
             self.stats[str(len(self.stats))] = total_infected
+        
+        self.show_data()
 
     def show_data(self):
-        
         plt.plot(self.stats.keys(), self.stats.values())
         plt.title('Infected vs Days')
         plt.xlabel('Day')
