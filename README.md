@@ -9,6 +9,58 @@ This package allows you to model the course of an epidemic whilst altering setti
 
 The effectiveness of each 'prevention measure' will be determined using data from peer-reviewed studies on their efficacy in order to increase the accuracy of the model in controlled conditions.
 
+## The Model
+This model simulates the spread of an infectious disease through a population of people. At the beginning the user will choose the size of the population and the number of infected people at the outset, as well as other settings pertaining to the disease and prevention measures used by the population.
+
+Each 'day', people gather in locations with other people. The number of people per location will depend upon the population size, number of locations, and social distancing measures in place.
+
+The model then calculates the 'infectivity' of the location from the sum of the infectivity of each infected person in it. If there are no infected people in the location, the infectivity will be 0.
+
+The model calculates the susceptibility of each uninfected, non-immune person who is in a location with at least 1 infected person based upon their prevention measures such as mask-wearing.
+
+For each infected person who shares a room with at least one non-infected, non-immune person, the model calculates the infected person's infecitivity based upon their personal prevention measures and the overall infectivity of the disease.
+
+We then use the above data to determine whether a given person will become infected. Some variance can be added to the duration of their infection as well as the period of immunity they gain post-recovery.
+
+## Settings
+Note: all settings can be changed after the simulation starts unless stated otherwise.
+
+- Number of people
+
+The total population at the beginning of the simulation. This cannot be changed after the simulation begins.
+
+- Number of infected
+
+The number of infected people at the beginning of the simulaiton. This cannot be changed after the simulation begins.
+
+- Number of locations
+
+The number of locations in which the population can gather.
+
+- Virus infectivity
+
+The basic infectivity of the disease. Higher numbers are more infectious.
+
+- Post-recovery immunity period
+
+The length of time for which a person who has recovered has immunity to re-infection.
+
+- Post-recovery immunity period variance
+
+The amount of randomness applied to the period of immunity granted after recovery.
+
+- Infection duration
+
+The period for which in infected person stays infected.
+
+- Infection duration variance
+
+The amount of randomness of the infection duration.
+
+- Days to simulate
+
+How many days to simulate. This can be changed and repeated to move in smaller or larger steps.
+
 ## Studies on prevention method efficacy
 Below is a list of papers I have used to determine the efficacy of given prevention methods. This list will be updated as more data is used.
 
