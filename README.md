@@ -57,6 +57,10 @@ The period for which in infected person stays infected.
 
 The amount of randomness of the infection duration.
 
+- Mortality rate
+
+The percentage of cases which will result in death.
+
 - Days to simulate
 
 How many days to simulate. This can be changed and repeated to move in smaller or larger steps.
