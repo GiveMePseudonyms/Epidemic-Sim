@@ -51,25 +51,24 @@ class Simulation:
     def create_widgets(self, widget_type):
         if widget_type == 'settings':   
             self.lbl_spn_num_people = ttk.Label(self.settings_frame, text='Number of people')
-            self.spn_num_people = ttk.Spinbox(self.settings_frame, from_=1, to=rules['max people'])
+            self.entry_num_people = ttk.Entry(self.settings_frame)
 
             self.lbl_number_of_infected = ttk.Label(self.settings_frame, text='Number of infected')
-            self.spn_number_of_infected = ttk.Spinbox(self.settings_frame, from_=1, to=rules['max people'])
+            self.entry_number_of_infected = ttk.Entry(self.settings_frame)
 
             self.lbl_number_of_locations = ttk.Label(self.settings_frame, text='Number of locations')
-            self.spn_number_of_locations = ttk.Spinbox(self.settings_frame, from_=1, to=10000)
+            self.entry_number_of_locations = ttk.Entry(self.settings_frame)
             
             settings_widgets = [
-                self.lbl_spn_num_people, self.spn_num_people,
-                self.lbl_number_of_infected, self.spn_number_of_infected,
-                self.lbl_number_of_locations, self.spn_number_of_locations,
+                self.lbl_spn_num_people, self.entry_num_people,
+                self.lbl_number_of_infected, self.entry_number_of_infected,
+                self.lbl_number_of_locations, self.entry_number_of_locations,
             ]
-
             return settings_widgets
 
         if widget_type == 'action':
             self.lbl_spn_days_to_sim = ttk.Label(self.action_frame, text='Days to simulate')
-            self.spn_days_to_sim = ttk.Spinbox(self.action_frame, from_=1, to=10)
+            self.spn_days_to_sim = ttk.Spinbox(self.action_frame, from_=1, to=99999)
 
             self.btn_show_data = ttk.Button(self.action_frame, text='Show data', command=lambda: self.show_data())
 
@@ -128,15 +127,10 @@ class Simulation:
                     location_index = random.randint(0, num_locations -1)
                     locations_list[location_index].add_person(person)
                     person.location = location_index
-                    #print(f'assigning person to location {location_index}')
-
-                #print(f'''There are {len(self.people)} total people, of which:''')
-
-                #for _ in range(0, len(locations_list)):
-                #  print(f'{len(locations_list[_].people)} are in location {_}')
                     
                 for location in locations_list:
-                    # a location is NOT valid is all people in it are infected or all people in it are healthy, since the outcome is deterministic in those cases
+                    # a location is NOT valid is all people in it are infected or all people in it are healthy, 
+                    # since the outcome is deterministic in those cases
                     location.check_if_valid()
 
                 for person in self.people:
@@ -156,7 +150,8 @@ class Simulation:
                         for person in location.people:
                             if person.susceptibility > 0:
                                 chance_of_infection = self.calculate_chance_of_infection(person, location)
-                                if random.randint(1, 100) <= chance_of_infection:
+                                rnd = random.uniform(1, 100)
+                                if rnd <= chance_of_infection:
                                     person.infect()
                             else: pass
                     
@@ -186,38 +181,41 @@ class Simulation:
         palette = ['#b52b2b', '#2b72b5', '#4dbf6d']
         plt.stackplot(1, 1)
         plt.clf()
-        plt.stackplot(self.stats.days, self.stats.total_infected, self.stats.total_healthy, self.stats.total_vaccinated, labels=['Total infected', 'Total healthy', 'Total Vaccinated'], colors=palette)
+        plt.stackplot(
+            self.stats.days, self.stats.total_infected, self.stats.total_healthy, self.stats.total_vaccinated,
+            labels=['Total infected', 'Total healthy', 'Total Vaccinated'],
+            colors=palette)
         plt.legend(loc='upper left')
         plt.show()
 
     def start(self):
         if self.initial_run:
             try:
-                int(self.spn_num_people.get())
+                int(self.entry_num_people.get())
             except Exception as exc:
                 self.throw_exception(exc, 'Number of people spinner.', 'Please enter an integer.')
                 return
 
             try:
-                int(self.spn_number_of_infected.get())
+                int(self.entry_number_of_infected.get())
             except Exception as exc:
                 self.throw_exception(exc, 'Number of infected spinner.', 'Please enter an integer.')
                 return
 
             try:
-                int(self.spn_number_of_locations.get())
+                int(self.entry_number_of_locations.get())
             except Exception as exc:
                 self.throw_exception(exc, 'Number of locations spinner.', 'Please enter an integer')
                 return
 
-
-
-            total_people = int(self.spn_num_people.get())
-            num_infected = int(self.spn_number_of_infected.get())
-            num_healhty = int(self.spn_num_people.get()) - num_infected
+            total_people = int(self.entry_num_people.get())
+            num_infected = int(self.entry_number_of_infected.get())
+            num_healhty = int(self.entry_num_people.get()) - num_infected
 
             if num_infected > total_people:
-                self.throw_exception('Invalid data.', 'More infected than healthy people!', 'The number of infected must be lower than the total number of people!')
+                self.throw_exception('Invalid data.', 
+                                    'More infected than healthy people!', 
+                                    'The number of infected must be lower than the total number of people!')
                 return
 
             for _ in range(0, num_healhty):
@@ -228,9 +226,6 @@ class Simulation:
                 person = Person(is_vaccinated=False, is_infected=True, is_masked=False)
                 self.people.append(person)
 
-        #for person in self.people:
-         #   print(f'Person created. Vaccinated: {person.is_vaccinated}. Infected: {person.is_infected}. Protection: {person.protection}.')
-
         try:
             days_to_sim = int(self.spn_days_to_sim.get())
         except Exception as exc:
@@ -238,17 +233,17 @@ class Simulation:
             return
 
         try:
-            int(self.spn_number_of_locations.get())
+            int(self.entry_number_of_locations.get())
         except Exception as exc:
             self.throw_exception(exc, 'Number of locations spinner.', 'Please enter an integer')
             return
 
-        rules['number of locations'] = int(self.spn_number_of_locations.get())
+        rules['number of locations'] = int(self.entry_number_of_locations.get())
 
         if self.initial_run:
             self.btn_start['text'] = 'Continue'
-            self.spn_num_people.config(state='disabled')
-            self.spn_number_of_infected.config(state='disabled')
+            self.entry_num_people.config(state='disabled')
+            self.entry_number_of_infected.config(state='disabled')
         
         self.step(days_to_sim)
 
