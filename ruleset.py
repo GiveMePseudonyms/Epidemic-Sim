@@ -7,7 +7,9 @@ rules = {
             'mask mandates' : False,
             'virus infectivity': 0.118,
             'post-recovery immunity period': 25,
+            'post-recovery immunity period variance': 3,
             'infection duration': 15,
+            'infection duration variance': 8,
             'face mask efficacy': 0.2,
             'vaccination efficacy': 0.05,
         }

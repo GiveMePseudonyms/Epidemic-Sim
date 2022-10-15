@@ -13,7 +13,7 @@ class Simulation:
     def __init__(self):
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
-        self.WINDOW.geometry('500x500+800+400')
+        self.WINDOW.geometry('500x700+800+400')
 
         padx = 20
         pady = 20
@@ -65,8 +65,14 @@ class Simulation:
             self.lbl_post_recover_immunity_period = ttk.Label(self.settings_frame, text='Post-recovery immunity period')
             self.entry_post_recovery_immunity_period = ttk.Entry(self.settings_frame)
 
+            self.lbl_post_recovery_immunity_period_variance = ttk.Label(self.settings_frame, text='Post-recover immunity period variance')
+            self.spn_post_recovery_immunity_period_variance = ttk.Spinbox(self.settings_frame, from_=0, to=20)
+
             self.lbl_infection_duration = ttk.Label(self.settings_frame, text='Infection duration')
             self.entry_infection_duration = ttk.Entry(self.settings_frame)
+
+            self.lbl_infection_duration_variance = ttk.Label(self.settings_frame, text='Infection duration variance')
+            self.spn_infection_duration_variance = ttk.Spinbox(self.settings_frame, from_=0, to=20)
             
             settings_widgets = [
                 self.lbl_spn_num_people, self.entry_num_people,
@@ -74,7 +80,9 @@ class Simulation:
                 self.lbl_number_of_locations, self.entry_number_of_locations,
                 self.lbl_scale_virus_infectivity, self.scale_virus_infectivity,
                 self.lbl_post_recover_immunity_period, self.entry_post_recovery_immunity_period,
+                self.lbl_post_recovery_immunity_period_variance, self.spn_post_recovery_immunity_period_variance,
                 self.lbl_infection_duration, self.entry_infection_duration,
+                self.lbl_infection_duration_variance, self.spn_infection_duration_variance,
             ]
             return settings_widgets
 
@@ -132,7 +140,7 @@ class Simulation:
                 num_locations = rules['number of locations']
                 locations_list = []
 
-                for _ in range(0, num_locations):
+                for x in range(0, num_locations):
                     locations_list.append(Location())
 
                 for person in self.people:
@@ -164,38 +172,42 @@ class Simulation:
                                 chance_of_infection = self.calculate_chance_of_infection(person, location)
                                 rnd = random.uniform(1, 100)
                                 if rnd <= chance_of_infection:
-                                    person.infect()
+                                    person.infect(rules)
                             else: pass
                     
                 total_infected = 0
                 total_healhty = 0
                 total_vaccinated = 0
+                total_recovered = 0
                 for person in self.people:
                     if person.is_infected:
                         total_infected += 1
-                    if not person.is_infected:
+                    if not person.is_infected and not person.is_recovered:
                         total_healhty += 1
+                    if person.is_recovered:
+                        total_recovered += 1
                     if person.is_vaccinated:
-                        total_vaccinated +=1
-                
-                print(f'{total_infected}/{total_healhty + total_infected} are infected.')
+                        total_vaccinated += 1
 
+                print(f'Day{len(self.stats.days)}: {total_infected}/{len(self.people)} are infected.')
 
                 self.stats.days.append(len(self.stats.days))
                 self.stats.total_healthy.append(total_healhty)
                 self.stats.total_infected.append(total_infected)
+                self.stats.total_recovered.append(total_recovered)
                 self.stats.total_vaccinated.append(total_vaccinated)
             
         self.show_data()
 
     def show_data(self):
-        palette = ['#b52b2b', '#2b72b5', '#4dbf6d']
+        palette = ['#b52b2b', '#2b72b5', '#4dbf6d', '#e3fa95']
         plt.stackplot(1, 1)
         plt.clf()
         plt.stackplot(
-            self.stats.days, self.stats.total_infected, self.stats.total_healthy, self.stats.total_vaccinated,
-            labels=['Total infected', 'Total healthy', 'Total Vaccinated'],
+            self.stats.days, self.stats.total_infected, self.stats.total_healthy, self.stats.total_vaccinated, self.stats.total_recovered,
+            labels=['Total Infected', 'Total Healthy & Vulerable', 'Total Vaccinated', 'Total Recovered Immune'],
             colors=palette)
+        plt.title('Epidemic Sim')
         plt.legend(loc='upper left')
         plt.show()
 
@@ -247,11 +259,24 @@ class Simulation:
             int(self.entry_infection_duration.get())
         except Exception as exc:
             self.throw_exception(exc, 'Infection duration.', 'Please enter an integer.')
+            return False
 
         try:
             int(self.entry_post_recovery_immunity_period.get())
         except Exception as exc:
             self.throw_exception(exc, 'Post-recovery immunity period.', 'Please enter an integer.')
+            return False
+
+        try:
+            int(self.spn_infection_duration_variance.get())
+        except Exception as exc:
+            self.throw_exception(exc, 'Infection duration variance spinner', 'Please enter an integer.')
+            return False
+
+        try:
+            int(self.spn_post_recovery_immunity_period_variance.get())
+        except Exception as exc:
+            self.throw_exception(exc, 'Post-recover immunity period variance spinner', 'Please enter an integer.')
 
         return True
 
@@ -264,11 +289,11 @@ class Simulation:
 
             if self.initial_run:
                 for _ in range(0, num_healhty):
-                    person = Person(is_vaccinated=False, is_infected=False, is_masked=False)
+                    person = Person(is_vaccinated=False, is_infected=False, is_masked=False, rules=rules)
                     self.people.append(person)
                 
                 for _ in range(0, num_infected):
-                    person = Person(is_vaccinated=False, is_infected=True, is_masked=False)
+                    person = Person(is_vaccinated=False, is_infected=True, is_masked=False, rules=rules)
                     self.people.append(person)
 
                 self.btn_start['text'] = 'Continue'
@@ -278,8 +303,10 @@ class Simulation:
 
             rules['number of locations'] = int(self.entry_number_of_locations.get())
             rules['virus infectivity'] = float(self.scale_virus_infectivity.get()/100)
-            rules['infection duration'] - int(self.entry_infection_duration.get())
+            rules['infection duration'] = int(self.entry_infection_duration.get())
+            rules['infection duration variance'] = int(self.spn_infection_duration_variance.get())
             rules['post-recovery immunity period'] = int(self.entry_post_recovery_immunity_period.get())
+            rules['post-recovery immunity period variance'] = int(self.spn_post_recovery_immunity_period_variance.get())
 
             days_to_sim = int(self.spn_days_to_sim.get())
             self.step(days_to_sim)

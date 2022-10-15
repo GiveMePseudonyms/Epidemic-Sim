@@ -4,3 +4,4 @@ class DataObject:
         self.total_infected = []
         self.total_healthy = []
         self.total_vaccinated = []
+        self.total_recovered = []
