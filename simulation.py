@@ -65,7 +65,7 @@ class Simulation:
             self.lbl_post_recover_immunity_period = ttk.Label(self.settings_frame, text='Post-recovery immunity period')
             self.entry_post_recovery_immunity_period = ttk.Entry(self.settings_frame)
 
-            self.lbl_post_recovery_immunity_period_variance = ttk.Label(self.settings_frame, text='Post-recover immunity period variance')
+            self.lbl_post_recovery_immunity_period_variance = ttk.Label(self.settings_frame, text='Post-recovery immunity period variance')
             self.spn_post_recovery_immunity_period_variance = ttk.Spinbox(self.settings_frame, from_=0, to=20)
 
             self.lbl_infection_duration = ttk.Label(self.settings_frame, text='Infection duration')
