@@ -25,44 +25,34 @@ We then use the above data to determine whether a given person will become infec
 ## Settings
 Note: all settings can be changed after the simulation starts unless stated otherwise.
 
-- Number of people
-
+### Number of people
 The total population at the beginning of the simulation. This cannot be changed after the simulation begins.
 
-- Number of infected
-
+### Number of infected
 The number of infected people at the beginning of the simulaiton. This cannot be changed after the simulation begins.
 
-- Number of locations
-
+### Number of locations
 The number of locations in which the population can gather.
 
-- Virus infectivity
-
+### Virus infectivity
 The basic infectivity of the disease. Higher numbers are more infectious.
 
-- Post-recovery immunity period
-
+### Post-recovery immunity period
 The length of time for which a person who has recovered has immunity to re-infection.
 
-- Post-recovery immunity period variance
-
+### Post-recovery immunity period variance
 The amount of randomness applied to the period of immunity granted after recovery.
 
-- Infection duration
-
+### Infection duration
 The period for which in infected person stays infected.
 
-- Infection duration variance
-
+### Infection duration variance
 The amount of randomness of the infection duration.
 
-- Mortality rate
-
+### Mortality rate
 The percentage of cases which will result in death.
 
-- Days to simulate
-
+### Days to simulate
 How many days to simulate. This can be changed and repeated to move in smaller or larger steps.
 
 ## Studies on prevention method efficacy
