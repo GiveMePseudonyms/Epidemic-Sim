@@ -13,4 +13,5 @@ The effectiveness of each 'prevention measure' will be determined using data fro
 Below is a list of papers I have used to determine the efficacy of given prevention methods. This list will be updated as more data is used.
 
 ## Limitations
-The real world is chaotic and extremely difficult to accurately model. This model should be used for demonstration purposes.
+- The real world is chaotic and extremely difficult to accurately model. This model should be used for demonstration purposes.
+- This package is computationally expensive and where fast simulation times are important, has a maximum population size of approximately 100,000 and no more than 300,000. Larger populations significantly slow down the model. There are various code improvements that can increase the speed of the model which will be regularly tested and applied.
