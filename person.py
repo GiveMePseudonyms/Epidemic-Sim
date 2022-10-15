@@ -13,6 +13,7 @@ class Person:
 
         self.is_recovered = False
         self.days_since_recovery = 0
+        self.valid_location = True
 
     def infect(self):
         self.is_infected = True
@@ -36,6 +37,26 @@ class Person:
             
             self.infectivity = float(rules['virus infectivity'] * prevention_measures)
             return
+    
+    def progress_infection(self, rules):
+        if self.is_infected and self.days_since_infection <= rules['infection duration']:
+            self.days_since_infection += 1
+            self.susceptibility = 0
+            return
+
+        if self.is_infected and self.days_since_infection > rules['infection duration']:
+            self.recover()
+            self.susceptibility = 0
+            return
+
+        if self.is_recovered and self.days_since_recovery <= rules['post-recovery immunity period']:
+            self.days_since_recovery += 1
+            self.susceptibility = 0
+            return
+
+        if self.is_recovered and self.days_since_recovery > rules['post-recovery immunity period']:
+            self.days_since_recovery = 0
+            self.is_recovered = False
 
     def calculate_susceptibility(self, rules):
         if self.is_infected and self.days_since_infection <= rules['infection duration']:
