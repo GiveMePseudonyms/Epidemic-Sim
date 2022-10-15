@@ -13,7 +13,7 @@ class Simulation:
     def __init__(self):
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
-        self.WINDOW.geometry('500x500+400+400')
+        self.WINDOW.geometry('500x500+800+400')
 
         padx = 20
         pady = 20
@@ -58,11 +58,23 @@ class Simulation:
 
             self.lbl_number_of_locations = ttk.Label(self.settings_frame, text='Number of locations')
             self.entry_number_of_locations = ttk.Entry(self.settings_frame)
+
+            self.lbl_scale_virus_infectivity = ttk.Label(self.settings_frame, text='Virus infectivity')
+            self.scale_virus_infectivity = tkinter.Scale(self.settings_frame, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
+
+            self.lbl_post_recover_immunity_period = ttk.Label(self.settings_frame, text='Post-recovery immunity period')
+            self.entry_post_recovery_immunity_period = ttk.Entry(self.settings_frame)
+
+            self.lbl_infection_duration = ttk.Label(self.settings_frame, text='Infection duration')
+            self.entry_infection_duration = ttk.Entry(self.settings_frame)
             
             settings_widgets = [
                 self.lbl_spn_num_people, self.entry_num_people,
                 self.lbl_number_of_infected, self.entry_number_of_infected,
                 self.lbl_number_of_locations, self.entry_number_of_locations,
+                self.lbl_scale_virus_infectivity, self.scale_virus_infectivity,
+                self.lbl_post_recover_immunity_period, self.entry_post_recovery_immunity_period,
+                self.lbl_infection_duration, self.entry_infection_duration,
             ]
             return settings_widgets
 
@@ -176,7 +188,6 @@ class Simulation:
             
         self.show_data()
 
-
     def show_data(self):
         palette = ['#b52b2b', '#2b72b5', '#4dbf6d']
         plt.stackplot(1, 1)
@@ -188,64 +199,90 @@ class Simulation:
         plt.legend(loc='upper left')
         plt.show()
 
-    def start(self):
-        if self.initial_run:
-            try:
-                int(self.entry_num_people.get())
-            except Exception as exc:
-                self.throw_exception(exc, 'Number of people spinner.', 'Please enter an integer.')
-                return
-
-            try:
-                int(self.entry_number_of_infected.get())
-            except Exception as exc:
-                self.throw_exception(exc, 'Number of infected spinner.', 'Please enter an integer.')
-                return
-
-            try:
-                int(self.entry_number_of_locations.get())
-            except Exception as exc:
-                self.throw_exception(exc, 'Number of locations spinner.', 'Please enter an integer')
-                return
-
-            total_people = int(self.entry_num_people.get())
-            num_infected = int(self.entry_number_of_infected.get())
-            num_healhty = int(self.entry_num_people.get()) - num_infected
-
-            if num_infected > total_people:
-                self.throw_exception('Invalid data.', 
-                                    'More infected than healthy people!', 
-                                    'The number of infected must be lower than the total number of people!')
-                return
-
-            for _ in range(0, num_healhty):
-                person = Person(is_vaccinated=False, is_infected=False, is_masked=False)
-                self.people.append(person)
-            
-            for _ in range(0, num_infected):
-                person = Person(is_vaccinated=False, is_infected=True, is_masked=False)
-                self.people.append(person)
+    def validate_options(self):
+        try:
+            int(self.entry_num_people.get())
+        except Exception as exc:
+            self.throw_exception(exc, 'Number of people spinner.', 'Please enter an integer.')
+            return False
 
         try:
-            days_to_sim = int(self.spn_days_to_sim.get())
+            int(self.entry_number_of_infected.get())
         except Exception as exc:
-            self.throw_exception(exc, 'Days to sim spinner.', 'Please enter an integer!')
-            return
+            self.throw_exception(exc, 'Number of infected spinner.', 'Please enter an integer.')
+            return False
+
+        if int(self.entry_number_of_infected.get()) > int(self.entry_num_people.get()):
+            self.throw_exception('Invalid data.', 
+                                'More infected than healthy people!', 
+                                'The number of infected must be lower than the total number of people!')
+            return False
 
         try:
             int(self.entry_number_of_locations.get())
         except Exception as exc:
-            self.throw_exception(exc, 'Number of locations spinner.', 'Please enter an integer')
-            return
-
-        rules['number of locations'] = int(self.entry_number_of_locations.get())
-
-        if self.initial_run:
-            self.btn_start['text'] = 'Continue'
-            self.entry_num_people.config(state='disabled')
-            self.entry_number_of_infected.config(state='disabled')
+            self.throw_exception(exc, 'Number of locations spinner.', 'Please enter an integer.')
+            return False
         
-        self.step(days_to_sim)
+        try:
+            days_to_sim = int(self.spn_days_to_sim.get())
+        except Exception as exc:
+            self.throw_exception(exc, 'Days to sim spinner.', 'Please enter an integer.')
+            return False
+
+        try:
+            int(self.entry_number_of_locations.get())
+        except Exception as exc:
+            self.throw_exception(exc, 'Number of locations spinner.', 'Please enter an integer.')
+            return False
+
+        try:
+            int(self.scale_virus_infectivity.get())
+        except Exception as exc:
+            self.throw_exception(exc, 
+                                'Virus infectivity scale.', 
+                                'Please select an integer... Not even sure how you broke this setting...')
+
+        try:
+            int(self.entry_infection_duration.get())
+        except Exception as exc:
+            self.throw_exception(exc, 'Infection duration.', 'Please enter an integer.')
+
+        try:
+            int(self.entry_post_recovery_immunity_period.get())
+        except Exception as exc:
+            self.throw_exception(exc, 'Post-recovery immunity period.', 'Please enter an integer.')
+
+        return True
+
+
+    def start(self):
+        if self.validate_options():
+            total_people = int(self.entry_num_people.get())
+            num_infected = int(self.entry_number_of_infected.get())
+            num_healhty = total_people - num_infected
+
+            if self.initial_run:
+                for _ in range(0, num_healhty):
+                    person = Person(is_vaccinated=False, is_infected=False, is_masked=False)
+                    self.people.append(person)
+                
+                for _ in range(0, num_infected):
+                    person = Person(is_vaccinated=False, is_infected=True, is_masked=False)
+                    self.people.append(person)
+
+                self.btn_start['text'] = 'Continue'
+                self.entry_num_people.config(state='disabled')
+                self.entry_number_of_infected.config(state='disabled')
+                self.initial_run = False
+
+            rules['number of locations'] = int(self.entry_number_of_locations.get())
+            rules['virus infectivity'] = float(self.scale_virus_infectivity.get()/100)
+            rules['infection duration'] - int(self.entry_infection_duration.get())
+            rules['post-recovery immunity period'] = int(self.entry_post_recovery_immunity_period.get())
+
+            days_to_sim = int(self.spn_days_to_sim.get())
+            self.step(days_to_sim)
 
 if __name__ == '__main__':
     simulation = Simulation()
