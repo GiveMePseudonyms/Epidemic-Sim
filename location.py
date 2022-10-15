@@ -11,8 +11,7 @@ class Location:
         self.infectivity = 0
 
         for person in self.people:
-            if person.is_infected:
-                self.infectivity += person.infectivity
+            self.infectivity += person.infectivity
         return
 
     def check_if_valid(self):
@@ -23,10 +22,13 @@ class Location:
                 has_infected = True
             if not person.is_infected:
                 has_healthy = True
+
             if has_healthy is True and has_healthy is True:
                 for person in self.people: person.valid_location = True
                 self.valid = True
                 return
                 
         for person in self.people: person.valid_location = False
+
         self.valid = False
+        return

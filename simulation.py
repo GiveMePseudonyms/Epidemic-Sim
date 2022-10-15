@@ -8,12 +8,13 @@ import random
 from ruleset import rules
 import math
 from dataobject import DataObject
+import time
 
 class Simulation:
     def __init__(self):
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
-        self.WINDOW.geometry('500x700+800+400')
+        self.WINDOW.geometry('300x700+800+400')
 
         padx = 20
         pady = 20
@@ -43,6 +44,7 @@ class Simulation:
         self.initial_run = True
 
         self.people = []
+        self.dead_people = []
 
         self.stats = DataObject()
 
@@ -73,6 +75,9 @@ class Simulation:
 
             self.lbl_infection_duration_variance = ttk.Label(self.settings_frame, text='Infection duration variance')
             self.spn_infection_duration_variance = ttk.Spinbox(self.settings_frame, from_=0, to=20)
+
+            self.lbl_mortality_rate = ttk.Label(self.settings_frame, text='Mortality rate (%)')
+            self.scale_mortality_rate = tkinter.Scale(self.settings_frame, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
             
             settings_widgets = [
                 self.lbl_spn_num_people, self.entry_num_people,
@@ -83,6 +88,7 @@ class Simulation:
                 self.lbl_post_recovery_immunity_period_variance, self.spn_post_recovery_immunity_period_variance,
                 self.lbl_infection_duration, self.entry_infection_duration,
                 self.lbl_infection_duration_variance, self.spn_infection_duration_variance,
+                self.lbl_mortality_rate, self.scale_mortality_rate,
             ]
             return settings_widgets
 
@@ -138,74 +144,78 @@ class Simulation:
             if total_infected != 0:
 
                 num_locations = rules['number of locations']
-                locations_list = []
-
-                for x in range(0, num_locations):
-                    locations_list.append(Location())
-
+                locations_list = [Location() for x in range(0, num_locations)]
+  
                 for person in self.people:
                     location_index = random.randint(0, num_locations -1)
                     locations_list[location_index].add_person(person)
                     person.location = location_index
-                    
+
+                self.valid_locations = []
                 for location in locations_list:
                     # a location is NOT valid is all people in it are infected or all people in it are healthy, 
                     # since the outcome is deterministic in those cases
                     location.check_if_valid()
-
+                    if location.valid:
+                        self.valid_locations.append(location)
+                    
                 for person in self.people:
                     if person.valid_location:
                         person.calculate_infectivity(rules)
                         person.calculate_susceptibility(rules)
+                        person.progress_infection(rules)
                     else:
                         if person.is_infected:
                             person.progress_infection(rules)
 
-                for location in locations_list:
-                    if location.valid:
+                for location in self.valid_locations:
                         location.calculate_infectivity()
 
-                for location in locations_list:
-                    if location.valid:
-                        for person in location.people:
-                            if person.susceptibility > 0:
-                                chance_of_infection = self.calculate_chance_of_infection(person, location)
-                                rnd = random.uniform(1, 100)
-                                if rnd <= chance_of_infection:
-                                    person.infect(rules)
-                            else: pass
+                for location in self.valid_locations:
+                    for person in location.people:
+                        if person.susceptibility > 0:
+                            chance_of_infection = self.calculate_chance_of_infection(person, location)
+                            rnd = random.uniform(1, 100)
+                            if rnd <= chance_of_infection:
+                                person.infect(rules)
+                        else: pass
                     
                 total_infected = 0
                 total_healhty = 0
                 total_vaccinated = 0
                 total_recovered = 0
+                total_dead = 0
                 for person in self.people:
-                    if person.is_infected:
+                    if person.is_infected and not person.is_dead:
                         total_infected += 1
-                    if not person.is_infected and not person.is_recovered:
+                    if not person.is_infected and not person.is_recovered and not person.is_dead:
                         total_healhty += 1
-                    if person.is_recovered:
+                    if person.is_recovered and not person.is_dead:
                         total_recovered += 1
-                    if person.is_vaccinated:
+                    if person.is_vaccinated and not person.is_dead:
                         total_vaccinated += 1
-
-                print(f'Day{len(self.stats.days)}: {total_infected}/{len(self.people)} are infected.')
+                    if person.is_dead:
+                        self.people.remove(person)
+                        self.dead_people.append(person)
 
                 self.stats.days.append(len(self.stats.days))
                 self.stats.total_healthy.append(total_healhty)
                 self.stats.total_infected.append(total_infected)
                 self.stats.total_recovered.append(total_recovered)
                 self.stats.total_vaccinated.append(total_vaccinated)
+                self.stats.total_dead.append(len(self.dead_people))
+
+                print(f'Day{len(self.stats.days)}: {total_infected}/{len(self.people) + len(self.dead_people)} are infected. {len(self.dead_people)} are dead.')
             
         self.show_data()
 
     def show_data(self):
-        palette = ['#b52b2b', '#2b72b5', '#4dbf6d', '#e3fa95']
+        palette = ['#b52b2b', '#2b72b5', '#4dbf6d', '#e3fa95', '#000000']
         plt.stackplot(1, 1)
         plt.clf()
         plt.stackplot(
-            self.stats.days, self.stats.total_infected, self.stats.total_healthy, self.stats.total_vaccinated, self.stats.total_recovered,
-            labels=['Total Infected', 'Total Healthy & Vulerable', 'Total Vaccinated', 'Total Recovered Immune'],
+            self.stats.days, self.stats.total_infected, self.stats.total_healthy, self.stats.total_vaccinated, self.stats.total_recovered, self.stats.total_dead,
+            labels=['Total Infected', 'Total Healthy & Vulerable', 'Total Vaccinated', 'Total Recovered Immune', 'Total Dead'],
             colors=palette)
         plt.title('Epidemic Sim')
         plt.legend(loc='upper left')
@@ -307,6 +317,7 @@ class Simulation:
             rules['infection duration variance'] = int(self.spn_infection_duration_variance.get())
             rules['post-recovery immunity period'] = int(self.entry_post_recovery_immunity_period.get())
             rules['post-recovery immunity period variance'] = int(self.spn_post_recovery_immunity_period_variance.get())
+            rules['mortality %'] = int(self.scale_mortality_rate.get())
 
             days_to_sim = int(self.spn_days_to_sim.get())
             self.step(days_to_sim)

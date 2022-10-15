@@ -21,6 +21,8 @@ class Person:
         self.days_since_recovery = 0
         self.valid_location = True
 
+        self.is_dead = False
+
     def infect(self, rules):
         self.is_infected = True
         self.is_recovered = False
@@ -54,6 +56,9 @@ class Person:
 
         self.recovery_immunity_period = recovery_immunity_period
 
+    def die(self):
+        self.is_dead = True
+
     def calculate_infectivity(self, rules):
         if not self.is_infected:
             self.infectivity = 0
@@ -74,9 +79,13 @@ class Person:
             return
 
         if self.is_infected and self.days_since_infection > self.infection_duration:
-            self.recover(rules)
-            self.susceptibility = 0
-            return
+            if random.randint(1, 100) <= rules['mortality %']:
+                self.die()
+                return
+            else:
+                self.recover(rules)
+                self.susceptibility = 0
+                return
 
         if self.is_recovered and self.days_since_recovery <= self.recovery_immunity_period:
             self.days_since_recovery += 1
@@ -89,17 +98,14 @@ class Person:
 
     def calculate_susceptibility(self, rules):
         if self.is_infected and self.days_since_infection <= self.infection_duration:
-            self.days_since_infection += 1
             self.susceptibility = 0
             return
 
         if self.is_infected and self.days_since_infection > self.infection_duration:
-            self.recover(rules)
             self.susceptibility = 0
             return
 
         if self.is_recovered and self.days_since_recovery <= self.recovery_immunity_period:
-            self.days_since_recovery += 1
             self.susceptibility = 0
             return
 

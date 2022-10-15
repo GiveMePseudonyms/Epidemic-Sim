@@ -12,4 +12,5 @@ rules = {
             'infection duration variance': 8,
             'face mask efficacy': 0.2,
             'vaccination efficacy': 0.05,
+            'mortality %': 5,
         }
