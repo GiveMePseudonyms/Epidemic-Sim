@@ -232,6 +232,8 @@ class Simulation:
 
                 print(f'Day{len(self.stats.days)}: {total_infected}/{len(self.people) + len(self.dead_people)} are infected. {len(self.dead_people)} are dead.')
 
+                self.WINDOW.update()
+
     def show_data(self):
         palette = ['#b52b2b', '#2b72b5', '#4dbf6d', '#e3fa95', '#000000']
         plt.stackplot(1, 1)
@@ -315,11 +317,6 @@ class Simulation:
 
         return True
 
-    def build_sim_thread(self, days_to_sim):
-        simthread = Thread(target=lambda: self.step(days_to_sim))
-        return simthread
-
-
     def start(self):
         if self.validate_options(): 
             total_people = int(self.entry_num_people.get())
@@ -353,11 +350,8 @@ class Simulation:
             rules['vaccination chance'] = int(self.scale_vaccination_chance.get())
 
             days_to_sim = int(self.spn_days_to_sim.get())
-            simthread = self.build_sim_thread(days_to_sim)
-            
-            simthread.start()
-            self.WINDOW.update()
-            simthread.join()
+            # simthread = self.build_sim_thread(days_to_sim)
+            self.step(days_to_sim)
 
             self.show_data()
 
