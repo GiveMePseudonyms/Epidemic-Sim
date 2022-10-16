@@ -32,22 +32,11 @@ class Simulation:
         self.tabs.add(self.tab_prevention, text='Prevention Settings')
 
         self.tabs.pack()
-
-        self.settings_frame = tkinter.Frame(self.WINDOW)
-        #self.settings_frame.grid(column=0, row=0, padx=padx, pady=pady)
-
-        self.graph_frame = tkinter.Frame(self.WINDOW)
-        #self.graph_frame.grid(column=1, row=0, padx=padx, pady=pady)
-        
-        self.pad_frame = tkinter.Frame(self.WINDOW)
-        #self.pad_frame.grid(column=0, row=2, pady=20, padx=padx)
         
         self.action_frame  = tkinter.Frame(self.WINDOW)
         self.action_frame.pack()
         #self.action_frame.grid(column=0, row=3, padx=padx)
-
-        self.padding = ttk.Label(self.pad_frame ,text='')
-
+        
         self.settings_widgets = self.create_widgets('settings')
         for widget in self.settings_widgets:
             widget.pack()
