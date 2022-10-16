@@ -36,11 +36,10 @@ class Simulation:
         self.action_frame  = tkinter.Frame(self.WINDOW)
         self.action_frame.pack()
         #self.action_frame.grid(column=0, row=3, padx=padx)
-        
+
         self.settings_widgets = self.create_widgets('settings')
         for widget in self.settings_widgets:
             widget.pack()
-            #widget.grid(column=0, row=self.settings_widgets.index(widget))
 
         self.action_widgets = self.create_widgets('action')
         for widget in self.action_widgets:
@@ -69,12 +68,6 @@ class Simulation:
             self.lbl_scale_virus_infectivity = ttk.Label(self.tab_virus, text='Virus infectivity')
             self.scale_virus_infectivity = tkinter.Scale(self.tab_virus, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
 
-            self.lbl_post_recover_immunity_period = ttk.Label(self.tab_virus, text='Post-recovery immunity period')
-            self.entry_post_recovery_immunity_period = ttk.Entry(self.tab_virus)
-
-            self.lbl_post_recovery_immunity_period_variance = ttk.Label(self.tab_virus, text='Post-recovery immunity period variance')
-            self.spn_post_recovery_immunity_period_variance = ttk.Spinbox(self.tab_virus, from_=0, to=20)
-
             self.lbl_infection_duration = ttk.Label(self.tab_virus, text='Infection duration')
             self.entry_infection_duration = ttk.Entry(self.tab_virus)
 
@@ -84,10 +77,16 @@ class Simulation:
             self.lbl_mortality_rate = ttk.Label(self.tab_virus, text='Mortality rate (%)')
             self.scale_mortality_rate = tkinter.Scale(self.tab_virus, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
 
+            self.lbl_post_recover_immunity_period = ttk.Label(self.tab_virus, text='Post-recovery immunity period')
+            self.entry_post_recovery_immunity_period = ttk.Entry(self.tab_virus)
+
+            self.lbl_post_recovery_immunity_period_variance = ttk.Label(self.tab_virus, text='Post-recovery immunity period variance')
+            self.spn_post_recovery_immunity_period_variance = ttk.Spinbox(self.tab_virus, from_=0, to=20)
+
             self.chk_vaccinations = ttk.Checkbutton(self.tab_prevention, text='Vaccinations')
             self.chk_vaccinations.state(['!alternate'])
 
-            self.lbl_scale_vaccination_chance = ttk.Label(self.tab_prevention, text='Daily vaccination chance')
+            self.lbl_scale_vaccination_chance = ttk.Label(self.tab_prevention, text='Daily vaccination chance (%)')
             self.scale_vaccination_chance = tkinter.Scale(self.tab_prevention, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
             
             settings_widgets = [
@@ -95,11 +94,11 @@ class Simulation:
                 self.lbl_number_of_infected, self.entry_number_of_infected,
                 self.lbl_number_of_locations, self.entry_number_of_locations,
                 self.lbl_scale_virus_infectivity, self.scale_virus_infectivity,
-                self.lbl_post_recover_immunity_period, self.entry_post_recovery_immunity_period,
-                self.lbl_post_recovery_immunity_period_variance, self.spn_post_recovery_immunity_period_variance,
                 self.lbl_infection_duration, self.entry_infection_duration,
                 self.lbl_infection_duration_variance, self.spn_infection_duration_variance,
                 self.lbl_mortality_rate, self.scale_mortality_rate,
+                self.lbl_post_recover_immunity_period, self.entry_post_recovery_immunity_period,
+                self.lbl_post_recovery_immunity_period_variance, self.spn_post_recovery_immunity_period_variance,
                 self.chk_vaccinations,
                 self.lbl_scale_vaccination_chance, self.scale_vaccination_chance,
             ]
