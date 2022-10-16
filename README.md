@@ -1,6 +1,12 @@
 # Epidemic-Sim
 An agent-based model designed to model epidemics with varying degrees of infectivity, lethality, vaccination rates, mask-wearing, hand-washing. Written in Python. Started Oct 2022.
 
+## How to run
+Download the repo into a single folder, open a terminal in that folder, then type:
+```
+python3 simulation.py
+```
+
 ## System Design
 <img src="/sysdesign/EpidemicSim Mindmap.png" alt="Mindmap showing system design" title="Sysdesign Mindmap">
 
