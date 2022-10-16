@@ -14,16 +14,24 @@ class Simulation:
     def __init__(self):
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
-        self.WINDOW.geometry('500x750+800+300')
 
         padx = 20
         pady = 20
 
-        self.tabs = ttk.Notebook(self.WINDOW)
-        self.tabs.pack()
-        self.tab_virus = ttk.Frame(self.tabs, width=400, height=400)
+        tab_height = 400
+        tab_width = 400
 
-        self.tabs.add(self.tab_virus, text='Virus')
+        self.WINDOW.geometry(f'{tab_width + 60}x{tab_height + 200}+800+300')
+        
+        self.tabs = ttk.Notebook(self.WINDOW, width=tab_width, height=tab_height)
+        self.tab_sim = ttk.Frame(self.tabs, width=tab_width, height=tab_height)
+        self.tabs.add(self.tab_sim, text='Simulation Settings')
+        self.tab_virus = ttk.Frame(self.tabs, width=tab_width, height=tab_height)
+        self.tabs.add(self.tab_virus, text='Virus Settings')
+        self.tab_prevention = ttk.Frame(self.tabs, width=tab_width, height=tab_height)
+        self.tabs.add(self.tab_prevention, text='Prevention Settings')
+
+        self.tabs.pack()
 
         self.settings_frame = tkinter.Frame(self.WINDOW)
         #self.settings_frame.grid(column=0, row=0, padx=padx, pady=pady)
@@ -35,13 +43,15 @@ class Simulation:
         #self.pad_frame.grid(column=0, row=2, pady=20, padx=padx)
         
         self.action_frame  = tkinter.Frame(self.WINDOW)
+        self.action_frame.pack()
         #self.action_frame.grid(column=0, row=3, padx=padx)
 
         self.padding = ttk.Label(self.pad_frame ,text='')
 
         self.settings_widgets = self.create_widgets('settings')
         for widget in self.settings_widgets:
-            widget.grid(column=0, row=self.settings_widgets.index(widget))
+            widget.pack()
+            #widget.grid(column=0, row=self.settings_widgets.index(widget))
 
         self.action_widgets = self.create_widgets('action')
         for widget in self.action_widgets:
@@ -57,39 +67,39 @@ class Simulation:
         self.WINDOW.mainloop()
 
     def create_widgets(self, widget_type):
-        if widget_type == 'settings':   
-            self.lbl_spn_num_people = ttk.Label(self.settings_frame, text='Number of people')
-            self.entry_num_people = ttk.Entry(self.settings_frame)
+        if widget_type == 'settings':
+            self.lbl_spn_num_people = ttk.Label(self.tab_sim, text='Number of people')
+            self.entry_num_people = ttk.Entry(self.tab_sim)
 
-            self.lbl_number_of_infected = ttk.Label(self.settings_frame, text='Number of infected')
-            self.entry_number_of_infected = ttk.Entry(self.settings_frame)
+            self.lbl_number_of_infected = ttk.Label(self.tab_sim, text='Number of infected')
+            self.entry_number_of_infected = ttk.Entry(self.tab_sim)
 
-            self.lbl_number_of_locations = ttk.Label(self.settings_frame, text='Number of locations')
-            self.entry_number_of_locations = ttk.Entry(self.settings_frame)
+            self.lbl_number_of_locations = ttk.Label(self.tab_sim, text='Number of locations')
+            self.entry_number_of_locations = ttk.Entry(self.tab_sim)
 
-            self.lbl_scale_virus_infectivity = ttk.Label(self.settings_frame, text='Virus infectivity')
-            self.scale_virus_infectivity = tkinter.Scale(self.settings_frame, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
+            self.lbl_scale_virus_infectivity = ttk.Label(self.tab_virus, text='Virus infectivity')
+            self.scale_virus_infectivity = tkinter.Scale(self.tab_virus, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
 
-            self.lbl_post_recover_immunity_period = ttk.Label(self.settings_frame, text='Post-recovery immunity period')
-            self.entry_post_recovery_immunity_period = ttk.Entry(self.settings_frame)
+            self.lbl_post_recover_immunity_period = ttk.Label(self.tab_virus, text='Post-recovery immunity period')
+            self.entry_post_recovery_immunity_period = ttk.Entry(self.tab_virus)
 
-            self.lbl_post_recovery_immunity_period_variance = ttk.Label(self.settings_frame, text='Post-recovery immunity period variance')
-            self.spn_post_recovery_immunity_period_variance = ttk.Spinbox(self.settings_frame, from_=0, to=20)
+            self.lbl_post_recovery_immunity_period_variance = ttk.Label(self.tab_virus, text='Post-recovery immunity period variance')
+            self.spn_post_recovery_immunity_period_variance = ttk.Spinbox(self.tab_virus, from_=0, to=20)
 
-            self.lbl_infection_duration = ttk.Label(self.settings_frame, text='Infection duration')
-            self.entry_infection_duration = ttk.Entry(self.settings_frame)
+            self.lbl_infection_duration = ttk.Label(self.tab_virus, text='Infection duration')
+            self.entry_infection_duration = ttk.Entry(self.tab_virus)
 
-            self.lbl_infection_duration_variance = ttk.Label(self.settings_frame, text='Infection duration variance')
-            self.spn_infection_duration_variance = ttk.Spinbox(self.settings_frame, from_=0, to=20)
+            self.lbl_infection_duration_variance = ttk.Label(self.tab_virus, text='Infection duration variance')
+            self.spn_infection_duration_variance = ttk.Spinbox(self.tab_virus, from_=0, to=20)
 
-            self.lbl_mortality_rate = ttk.Label(self.settings_frame, text='Mortality rate (%)')
-            self.scale_mortality_rate = tkinter.Scale(self.settings_frame, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
+            self.lbl_mortality_rate = ttk.Label(self.tab_virus, text='Mortality rate (%)')
+            self.scale_mortality_rate = tkinter.Scale(self.tab_virus, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
 
-            self.chk_vaccinations = ttk.Checkbutton(self.settings_frame, text='Vaccinations')
+            self.chk_vaccinations = ttk.Checkbutton(self.tab_prevention, text='Vaccinations')
             self.chk_vaccinations.state(['!alternate'])
 
-            self.lbl_scale_vaccination_chance = ttk.Label(self.settings_frame, text='Daily vaccination chance')
-            self.scale_vaccination_chance = tkinter.Scale(self.settings_frame, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
+            self.lbl_scale_vaccination_chance = ttk.Label(self.tab_prevention, text='Daily vaccination chance')
+            self.scale_vaccination_chance = tkinter.Scale(self.tab_prevention, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
             
             settings_widgets = [
                 self.lbl_spn_num_people, self.entry_num_people,
