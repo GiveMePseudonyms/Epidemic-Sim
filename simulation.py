@@ -22,7 +22,7 @@ class Simulation:
         tab_height = 400
         tab_width = 400
 
-        self.WINDOW.geometry(f'{tab_width + 60}x{tab_height + 270}+800+300')
+        self.WINDOW.geometry(f'{tab_width + 60}x{tab_height + 280}+800+300')
 
         title = ttk.Label(self.WINDOW, text='Epidemic Simulator Settings', font=('Helvetica', 20), padding=10)
         title.pack()
@@ -58,6 +58,8 @@ class Simulation:
         self.dead_people = []
 
         self.stats = DataObject()
+
+        self.interrupt = False
 
         self.WINDOW.mainloop()
 
@@ -119,13 +121,19 @@ class Simulation:
 
             self.btn_start = ttk.Button(self.action_frame, text='Start', command=lambda: self.start())
 
+            self.btn_stop = ttk.Button(self.action_frame, text='Stop', command=self.interrupt)
+
             action_widgets = [
                 self.lbl_spn_days_to_sim, self.spn_days_to_sim,
                 self.btn_start,
+                self.btn_stop,
                 self.btn_show_data,
             ]
             
             return action_widgets
+    
+    def interrupt(self):
+        self.interrupt = True
 
     def throw_exception(self, exception, source, remedy):
         print(
@@ -155,6 +163,10 @@ class Simulation:
     def step(self, steps):
         self.initial_run = False
         for _ in range(1, steps + 1):
+
+            if self.interrupt:
+                self.interrupt = False
+                return
             
             total_infected = 0
             for person in self.people:
@@ -247,6 +259,14 @@ class Simulation:
         plt.title('Epidemic Sim')
         plt.legend(loc='upper left')
         plt.show()
+
+    def disable_options(self):
+        for widget in self.settings_widgets:
+            widget.config(state='disabled')
+
+    def enable_options(self):
+        for widget in self.settings_widgets:
+            widget.config(state= 'normal')
 
     def validate_options(self):
         try:
@@ -351,7 +371,9 @@ class Simulation:
 
             days_to_sim = int(self.spn_days_to_sim.get())
             # simthread = self.build_sim_thread(days_to_sim)
+            self.disable_options()
             self.step(days_to_sim)
+            self.enable_options()
 
             self.show_data()
 
