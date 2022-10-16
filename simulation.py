@@ -21,8 +21,11 @@ class Simulation:
         tab_height = 400
         tab_width = 400
 
-        self.WINDOW.geometry(f'{tab_width + 60}x{tab_height + 200}+800+300')
-        
+        self.WINDOW.geometry(f'{tab_width + 60}x{tab_height + 270}+800+300')
+
+        title = ttk.Label(self.WINDOW, text='Epidemic Simulator Settings', font=('Helvetica', 20), padding=10)
+        title.pack()
+
         self.tabs = ttk.Notebook(self.WINDOW, width=tab_width, height=tab_height)
         self.tab_sim = ttk.Frame(self.tabs, width=tab_width, height=tab_height)
         self.tabs.add(self.tab_sim, text='Simulation Settings')
@@ -33,6 +36,9 @@ class Simulation:
 
         self.tabs.pack()
         
+        simheading = ttk.Label(self.WINDOW, text='Run Model', font=('Helvetica', 18))
+        simheading.pack()
+
         self.action_frame  = tkinter.Frame(self.WINDOW)
         self.action_frame.pack()
         #self.action_frame.grid(column=0, row=3, padx=padx)
@@ -114,8 +120,8 @@ class Simulation:
 
             action_widgets = [
                 self.lbl_spn_days_to_sim, self.spn_days_to_sim,
-                self.btn_show_data,
                 self.btn_start,
+                self.btn_show_data,
             ]
             
             return action_widgets
