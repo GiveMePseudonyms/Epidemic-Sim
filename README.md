@@ -4,6 +4,7 @@ An agent-based model designed to model epidemics with varying degrees of infecti
 ## How to run
 Download the repo into a single folder, open a terminal in that folder, then type:
 ```
+pip3 install requirements.txt
 python3 simulation.py
 ```
 
