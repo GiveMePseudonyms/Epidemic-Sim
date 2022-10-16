@@ -14,7 +14,7 @@ class Simulation:
     def __init__(self):
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
-        self.WINDOW.geometry('300x700+800+400')
+        self.WINDOW.geometry('300x750+800+300')
 
         padx = 20
         pady = 20
@@ -78,6 +78,12 @@ class Simulation:
 
             self.lbl_mortality_rate = ttk.Label(self.settings_frame, text='Mortality rate (%)')
             self.scale_mortality_rate = tkinter.Scale(self.settings_frame, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
+
+            self.chk_vaccinations = ttk.Checkbutton(self.settings_frame, text='Vaccinations')
+            self.chk_vaccinations.state(['!alternate'])
+
+            self.lbl_scale_vaccination_chance = ttk.Label(self.settings_frame, text='Daily vaccination chance')
+            self.scale_vaccination_chance = tkinter.Scale(self.settings_frame, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
             
             settings_widgets = [
                 self.lbl_spn_num_people, self.entry_num_people,
@@ -89,6 +95,8 @@ class Simulation:
                 self.lbl_infection_duration, self.entry_infection_duration,
                 self.lbl_infection_duration_variance, self.spn_infection_duration_variance,
                 self.lbl_mortality_rate, self.scale_mortality_rate,
+                self.chk_vaccinations,
+                self.lbl_scale_vaccination_chance, self.scale_vaccination_chance,
             ]
             return settings_widgets
 
@@ -136,12 +144,18 @@ class Simulation:
     def step(self, steps):
         self.initial_run = False
         for _ in range(1, steps + 1):
+            
             total_infected = 0
-
             for person in self.people:
                 if person.is_infected:
                     total_infected += 1
             if total_infected != 0:
+
+                if rules['vaccinations']:
+                    for person in self.people:
+                        if not person.is_infected and not person.is_vaccinated:
+                            if random.randint(0, 1000) <= (rules['vaccination chance'] * 10):
+                                person.vaccinate()
 
                 num_locations = rules['number of locations']
                 locations_list = [Location() for x in range(0, num_locations)]
@@ -181,25 +195,25 @@ class Simulation:
                         else: pass
                     
                 total_infected = 0
-                total_healhty = 0
+                total_healhty_vulnerable = 0
                 total_vaccinated = 0
                 total_recovered = 0
                 total_dead = 0
                 for person in self.people:
                     if person.is_infected and not person.is_dead:
                         total_infected += 1
-                    if not person.is_infected and not person.is_recovered and not person.is_dead:
-                        total_healhty += 1
-                    if person.is_recovered and not person.is_dead:
+                    if not person.is_infected and not person.is_recovered and not person.is_dead and not person.is_vaccinated:
+                        total_healhty_vulnerable += 1
+                    if person.is_recovered and not person.is_dead and not person.is_vaccinated:
                         total_recovered += 1
-                    if person.is_vaccinated and not person.is_dead:
+                    if person.is_vaccinated and not person.is_dead and not person.is_infected:
                         total_vaccinated += 1
                     if person.is_dead:
                         self.people.remove(person)
                         self.dead_people.append(person)
 
                 self.stats.days.append(len(self.stats.days))
-                self.stats.total_healthy.append(total_healhty)
+                self.stats.total_healthy_vulnerable.append(total_healhty_vulnerable)
                 self.stats.total_infected.append(total_infected)
                 self.stats.total_recovered.append(total_recovered)
                 self.stats.total_vaccinated.append(total_vaccinated)
@@ -214,7 +228,9 @@ class Simulation:
         plt.stackplot(1, 1)
         plt.clf()
         plt.stackplot(
-            self.stats.days, self.stats.total_infected, self.stats.total_healthy, self.stats.total_vaccinated, self.stats.total_recovered, self.stats.total_dead,
+            self.stats.days, self.stats.total_infected, 
+            self.stats.total_healthy_vulnerable, self.stats.total_vaccinated, 
+            self.stats.total_recovered, self.stats.total_dead,
             labels=['Total Infected', 'Total Healthy & Vulerable', 'Total Vaccinated', 'Total Recovered Immune', 'Total Dead'],
             colors=palette)
         plt.title('Epidemic Sim')
@@ -290,9 +306,8 @@ class Simulation:
 
         return True
 
-
     def start(self):
-        if self.validate_options():
+        if self.validate_options(): 
             total_people = int(self.entry_num_people.get())
             num_infected = int(self.entry_number_of_infected.get())
             num_healhty = total_people - num_infected
@@ -318,6 +333,10 @@ class Simulation:
             rules['post-recovery immunity period'] = int(self.entry_post_recovery_immunity_period.get())
             rules['post-recovery immunity period variance'] = int(self.spn_post_recovery_immunity_period_variance.get())
             rules['mortality %'] = int(self.scale_mortality_rate.get())
+            if self.chk_vaccinations.instate(['selected']):
+                rules['vaccinations'] = True
+            else: rules['vaccinations'] = False
+            rules['vaccination chance'] = int(self.scale_vaccination_chance.get())
 
             days_to_sim = int(self.spn_days_to_sim.get())
             self.step(days_to_sim)
