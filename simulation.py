@@ -14,22 +14,28 @@ class Simulation:
     def __init__(self):
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
-        self.WINDOW.geometry('300x750+800+300')
+        self.WINDOW.geometry('500x750+800+300')
 
         padx = 20
         pady = 20
 
+        self.tabs = ttk.Notebook(self.WINDOW)
+        self.tabs.pack()
+        self.tab_virus = ttk.Frame(self.tabs, width=400, height=400)
+
+        self.tabs.add(self.tab_virus, text='Virus')
+
         self.settings_frame = tkinter.Frame(self.WINDOW)
-        self.settings_frame.grid(column=0, row=0, padx=padx, pady=pady)
+        #self.settings_frame.grid(column=0, row=0, padx=padx, pady=pady)
 
         self.graph_frame = tkinter.Frame(self.WINDOW)
-        self.graph_frame.grid(column=1, row=0, padx=padx, pady=pady)
+        #self.graph_frame.grid(column=1, row=0, padx=padx, pady=pady)
         
         self.pad_frame = tkinter.Frame(self.WINDOW)
-        self.pad_frame.grid(column=0, row=2, pady=20, padx=padx)
+        #self.pad_frame.grid(column=0, row=2, pady=20, padx=padx)
         
         self.action_frame  = tkinter.Frame(self.WINDOW)
-        self.action_frame.grid(column=0, row=3, padx=padx)
+        #self.action_frame.grid(column=0, row=3, padx=padx)
 
         self.padding = ttk.Label(self.pad_frame ,text='')
 
