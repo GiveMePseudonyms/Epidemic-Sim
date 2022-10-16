@@ -39,6 +39,15 @@ class Person:
         
         self.infection_duration = infection_duration
 
+    def vaccinate(self):
+        self.days_since_vaccination = 0
+        self.days_since_recovery = 0
+        self.is_recovered = False
+        self.is_vaccinated = True
+    
+    def unvaccinate(self):
+        self.is_vaccinated = False
+
     def recover(self, rules):
         self.is_infected = False
         self.is_recovered = True
@@ -72,30 +81,6 @@ class Person:
             self.infectivity = float(rules['virus infectivity'] * prevention_measures)
             return
     
-    def progress_infection(self, rules):
-        if self.is_infected and self.days_since_infection <= self.infection_duration:
-            self.days_since_infection += 1
-            self.susceptibility = 0
-            return
-
-        if self.is_infected and self.days_since_infection > self.infection_duration:
-            if random.randint(1, 100) <= rules['mortality %']:
-                self.die()
-                return
-            else:
-                self.recover(rules)
-                self.susceptibility = 0
-                return
-
-        if self.is_recovered and self.days_since_recovery <= self.recovery_immunity_period:
-            self.days_since_recovery += 1
-            self.susceptibility = 0
-            return
-
-        if self.is_recovered and self.days_since_recovery > self.recovery_immunity_period:
-            self.days_since_recovery = 0
-            self.is_recovered = False
-
     def calculate_susceptibility(self, rules):
         if self.is_infected and self.days_since_infection <= self.infection_duration:
             self.susceptibility = 0
@@ -121,3 +106,30 @@ class Person:
             prevention_measures *= rules['vaccination efficacy']
         
         self.susceptibility = float(rules['virus infectivity'] * prevention_measures)
+
+    def progress_infection(self, rules):
+        if self.is_infected and self.days_since_infection <= self.infection_duration:
+            self.days_since_infection += 1
+            self.susceptibility = 0
+            return
+
+        if self.is_infected and self.days_since_infection > self.infection_duration:
+            if random.randint(1, 100) <= rules['mortality %']:
+                self.die()
+                return
+            else:
+                self.recover(rules)
+                self.susceptibility = 0
+                return
+
+        if self.is_recovered and self.days_since_recovery <= self.recovery_immunity_period:
+            self.days_since_recovery += 1
+            self.susceptibility = 0
+            return
+
+        if self.is_recovered and self.days_since_recovery > self.recovery_immunity_period:
+            self.days_since_recovery = 0
+            self.is_recovered = False
+
+    def progress_vaccination(self):
+        pass
