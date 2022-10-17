@@ -11,7 +11,7 @@ rules = {
             'post-recovery immunity period': 25,
             'post-recovery immunity period variance': 3,
             'masks' : False,
-            'face mask efficacy': 0.2,
+            'face mask efficacy': 0.5,
             'vaccinations': False,
             'vaccination chance': 0.1,
             'vaccination efficacy': 0.05,

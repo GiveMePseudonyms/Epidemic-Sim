@@ -65,6 +65,8 @@ class Simulation:
 
     def create_widgets(self, widget_type):
         if widget_type == 'settings':
+
+            # Sim settings
             self.lbl_spn_num_people = ttk.Label(self.tab_sim, text='Number of people')
             self.entry_num_people = ttk.Entry(self.tab_sim)
 
@@ -74,6 +76,7 @@ class Simulation:
             self.lbl_number_of_locations = ttk.Label(self.tab_sim, text='Number of locations')
             self.entry_number_of_locations = ttk.Entry(self.tab_sim)
 
+            # Virus settings
             self.lbl_scale_virus_infectivity = ttk.Label(self.tab_virus, text='Virus infectivity')
             self.scale_virus_infectivity = tkinter.Scale(self.tab_virus, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
 
@@ -92,12 +95,17 @@ class Simulation:
             self.lbl_post_recovery_immunity_period_variance = ttk.Label(self.tab_virus, text='Post-recovery immunity period variance')
             self.spn_post_recovery_immunity_period_variance = ttk.Spinbox(self.tab_virus, from_=0, to=20)
 
+            # Prevention settings
             self.chk_vaccinations = ttk.Checkbutton(self.tab_prevention, text='Vaccinations')
             self.chk_vaccinations.state(['!alternate'])
 
             self.lbl_scale_vaccination_chance = ttk.Label(self.tab_prevention, text='Daily vaccination chance (%)')
             self.scale_vaccination_chance = tkinter.Scale(self.tab_prevention, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
-            
+
+            self.chk_masks = ttk.Checkbutton(self.tab_prevention, text='Masks')
+            self.chk_masks.state(['!alternate'])
+
+
             settings_widgets = [
                 self.lbl_spn_num_people, self.entry_num_people,
                 self.lbl_number_of_infected, self.entry_number_of_infected,
@@ -110,6 +118,7 @@ class Simulation:
                 self.lbl_post_recovery_immunity_period_variance, self.spn_post_recovery_immunity_period_variance,
                 self.chk_vaccinations,
                 self.lbl_scale_vaccination_chance, self.scale_vaccination_chance,
+                self.chk_masks,
             ]
             return settings_widgets
 
@@ -179,6 +188,13 @@ class Simulation:
                         if not person.is_infected and not person.is_vaccinated:
                             if random.randint(0, 1000) <= (rules['vaccination chance'] * 10):
                                 person.vaccinate()
+                
+                if rules['masks']:
+                    for person in self.people:
+                        person.is_masked = True
+                else: 
+                    for person in self.people:
+                        person.is_masked = False
 
                 num_locations = rules['number of locations']
                 locations_list = [Location() for x in range(0, num_locations)]
@@ -339,23 +355,6 @@ class Simulation:
 
     def start(self):
         if self.validate_options(): 
-            total_people = int(self.entry_num_people.get())
-            num_infected = int(self.entry_number_of_infected.get())
-            num_healhty = total_people - num_infected
-
-            if self.initial_run:
-                for _ in range(0, num_healhty):
-                    person = Person(is_vaccinated=False, is_infected=False, is_masked=False, rules=rules)
-                    self.people.append(person)
-                
-                for _ in range(0, num_infected):
-                    person = Person(is_vaccinated=False, is_infected=True, is_masked=False, rules=rules)
-                    self.people.append(person)
-
-                self.btn_start['text'] = 'Continue'
-                self.entry_num_people.config(state='disabled')
-                self.entry_number_of_infected.config(state='disabled')
-                self.initial_run = False
 
             rules['number of locations'] = int(self.entry_number_of_locations.get())
             rules['virus infectivity'] = float(self.scale_virus_infectivity.get()/100)
@@ -368,9 +367,30 @@ class Simulation:
                 rules['vaccinations'] = True
             else: rules['vaccinations'] = False
             rules['vaccination chance'] = int(self.scale_vaccination_chance.get())
+            if self.chk_masks.instate(['selected']):
+                rules['masks'] = True
+            else: rules['masks'] = False
+
+            total_people = int(self.entry_num_people.get())
+            num_infected = int(self.entry_number_of_infected.get())
+            num_healhty = total_people - num_infected
+
+            if self.initial_run:
+                for _ in range(0, num_healhty):
+                    person = Person(is_vaccinated=False, is_infected=False, is_masked=rules['masks'], rules=rules)
+                    self.people.append(person)
+                
+                for _ in range(0, num_infected):
+                    person = Person(is_vaccinated=False, is_infected=True, is_masked=rules['masks'], rules=rules)
+                    self.people.append(person)
+
+                self.btn_start['text'] = 'Continue'
+                self.entry_num_people.config(state='disabled')
+                self.entry_number_of_infected.config(state='disabled')
+                self.initial_run = False
 
             days_to_sim = int(self.spn_days_to_sim.get())
-            # simthread = self.build_sim_thread(days_to_sim)
+
             self.disable_options()
             self.step(days_to_sim)
             self.enable_options()
