@@ -4,9 +4,8 @@ from tkinter import messagebox
 import matplotlib.pyplot as plt
 from person import Person
 from location import Location
-import random
+from random import randint, uniform
 from ruleset import rules
-import math
 from dataobject import DataObject
 import time
 from threading import Thread
@@ -16,11 +15,9 @@ class Simulation:
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
 
-        padx = 20
-        pady = 20
+        padx, pady = 20, 20
 
-        tab_height = 400
-        tab_width = 400
+        tab_height, tab_width = 400, 400
 
         self.WINDOW.geometry(f'{tab_width + 60}x{tab_height + 280}+800+300')
 
@@ -63,8 +60,7 @@ class Simulation:
 
         self.initial_run = True
 
-        self.people = []
-        self.dead_people = []
+        self.people, self.dead_people = [], []
 
         self.stats = DataObject()
 
@@ -204,12 +200,12 @@ class Simulation:
                 if rules['vaccinations']:
                     for person in self.people:
                         if not person.is_infected and not person.is_vaccinated:
-                            if random.randint(0, 1000) <= (rules['vaccination chance'] * 10):
+                            if randint(0, 1000) <= (rules['vaccination chance'] * 10):
                                 person.vaccinate()
                 
                 if rules['masks']:
                     for person in self.people:
-                        if random.randint(0, 100) <= rules['mask usage']:
+                        if randint(0, 100) <= rules['mask usage']:
                             person.is_masked = True
                         else: person.is_masked = False
                 else:
@@ -220,7 +216,7 @@ class Simulation:
                 locations_list = [Location() for x in range(0, num_locations)]
   
                 for person in self.people:
-                    location_index = random.randint(0, num_locations -1)
+                    location_index = randint(0, num_locations -1)
                     locations_list[location_index].add_person(person)
                     person.location = location_index
 
@@ -248,16 +244,13 @@ class Simulation:
                     for person in location.people:
                         if person.susceptibility > 0:
                             chance_of_infection = self.calculate_chance_of_infection(person, location)
-                            rnd = random.uniform(1, 100)
+                            rnd = uniform(1, 100)
                             if rnd <= chance_of_infection:
                                 person.infect(rules)
                         else: pass
                     
-                total_infected = 0
-                total_healhty_vulnerable = 0
-                total_vaccinated = 0
-                total_recovered = 0
-                total_dead = 0
+                total_infected, total_healhty_vulnerable, total_vaccinated, total_recovered, total_dead = 0, 0, 0, 0, 0
+                
                 for person in self.people:
                     if person.is_infected and not person.is_dead:
                         total_infected += 1
@@ -401,14 +394,14 @@ class Simulation:
             if self.initial_run:
                 for _ in range(0, num_healhty):
                     masks = False
-                    if random.randint(1, 100) <= rules['mask usage']:
+                    if randint(1, 100) <= rules['mask usage']:
                         masks = True
                     person = Person(is_vaccinated=False, is_infected=False, is_masked=masks, rules=rules)
                     self.people.append(person)
                 
                 for _ in range(0, num_infected):
                     masks = False
-                    if random.randint(1, 100) <= rules['mask usage']:
+                    if randint(1, 100) <= rules['mask usage']:
                         masks = True
                     person = Person(is_vaccinated=False, is_infected=True, is_masked=masks, rules=rules)
                     self.people.append(person)

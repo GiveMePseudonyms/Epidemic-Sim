@@ -1,4 +1,4 @@
-import random
+from random import randint
 
 class Person:
     def __init__(self, is_vaccinated, is_infected, is_masked, rules):
@@ -31,10 +31,10 @@ class Person:
         rule_infection_duration = rules['infection duration']
         rule_infection_duration_variance = rules['infection duration variance']
         
-        infection_duration = random.randint(rule_infection_duration - rule_infection_duration_variance, 
+        infection_duration = randint(rule_infection_duration - rule_infection_duration_variance, 
                                             rule_infection_duration + rule_infection_duration_variance)
         while infection_duration <= 0:
-            infection_duration = random.randint(rule_infection_duration - rule_infection_duration_variance, 
+            infection_duration = randint(rule_infection_duration - rule_infection_duration_variance, 
                                                 rule_infection_duration + rule_infection_duration_variance)
         
         self.infection_duration = infection_duration
@@ -56,11 +56,11 @@ class Person:
         rule_post_recovery_immunity_period = rules['post-recovery immunity period']
         rule_post_recovery_immunity_period_variance = rules['post-recovery immunity period variance']
 
-        recovery_immunity_period = random.randint(rule_post_recovery_immunity_period - rule_post_recovery_immunity_period_variance,
+        recovery_immunity_period = randint(rule_post_recovery_immunity_period - rule_post_recovery_immunity_period_variance,
                                                     rule_post_recovery_immunity_period + rule_post_recovery_immunity_period_variance)
         
         while recovery_immunity_period <=0:
-                recovery_immunity_period = random.randint(rule_post_recovery_immunity_period - rule_post_recovery_immunity_period_variance,
+                recovery_immunity_period = randint(rule_post_recovery_immunity_period - rule_post_recovery_immunity_period_variance,
                                                             rule_post_recovery_immunity_period + rule_post_recovery_immunity_period_variance)
 
         self.recovery_immunity_period = recovery_immunity_period
@@ -114,7 +114,7 @@ class Person:
             return
 
         if self.is_infected and self.days_since_infection > self.infection_duration:
-            if random.randint(1, 100) <= rules['mortality %']:
+            if randint(1, 100) <= rules['mortality %']:
                 self.die()
                 return
             else:
