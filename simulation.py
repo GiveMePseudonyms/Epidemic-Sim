@@ -46,7 +46,9 @@ class Simulation:
 
         self.settings_widgets = self.create_widgets('settings')
         for widget in self.settings_widgets:
-            widget.pack()
+            if '!scale' in str(widget):
+                widget.pack(pady=(0,20))
+            else: widget.pack()
 
         self.action_widgets = self.create_widgets('action')
         for widget in self.action_widgets:
