@@ -14,6 +14,7 @@ class Simulation:
     def __init__(self):
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
+        self.WINDOW.resizable(False, False)
 
         padx, pady = 20, 20
 
