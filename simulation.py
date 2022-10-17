@@ -221,13 +221,13 @@ class Simulation:
                     person.location = location_index
 
                 self.valid_locations = []
+
                 for location in locations_list:
                     # a location is NOT valid is all people in it are infected or all people in it are healthy, 
                     # since the outcome is deterministic in those cases
                     location.check_if_valid()
-                    if location.valid:
-                        self.valid_locations.append(location)
-                    
+                self.valid_locations = [location for location in locations_list if location.valid]
+
                 for person in self.people:
                     if person.valid_location:
                         person.calculate_infectivity(rules)

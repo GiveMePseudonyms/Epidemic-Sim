@@ -1,8 +1,7 @@
 class Location:
     def __init__(self):
         self.people = []
-        self.total_location_infection_chance = 0
-        self.infectivity = 0
+        self.total_location_infection_chance, self.infectivity = 0, 0
 
     def add_person(self, person):
         self.people.append(person)
@@ -15,8 +14,7 @@ class Location:
         return
 
     def check_if_valid(self):
-        has_infected = None
-        has_healthy = None
+        has_infected, has_healthy = None, None
         for person in self.people:
             if person.is_infected:
                 has_infected = True
