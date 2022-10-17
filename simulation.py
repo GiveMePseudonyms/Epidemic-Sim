@@ -46,15 +46,16 @@ class Simulation:
 
         self.settings_widgets = self.create_widgets('settings')
         x = 1
+        widget_ypad = 10
         for widget in self.settings_widgets:
             if 'checkbutton' in str(widget):
-                widget.pack()
+                widget.pack(pady=(0,widget_ypad))
                 break
             if x == 1:
                 widget.pack()
                 x += 1
             elif x == 2:
-                widget.pack(pady=(0, 10))
+                widget.pack(pady=(0, widget_ypad))
                 x = 1
 
         self.action_widgets = self.create_widgets('action')
