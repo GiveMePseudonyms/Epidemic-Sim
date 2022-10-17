@@ -45,10 +45,17 @@ class Simulation:
         #self.action_frame.grid(column=0, row=3, padx=padx)
 
         self.settings_widgets = self.create_widgets('settings')
+        x = 1
         for widget in self.settings_widgets:
-            if '!scale' in str(widget):
-                widget.pack(pady=(0,20))
-            else: widget.pack()
+            if 'checkbutton' in str(widget):
+                widget.pack()
+                break
+            if x == 1:
+                widget.pack()
+                x += 1
+            elif x == 2:
+                widget.pack(pady=(0, 10))
+                x = 1
 
         self.action_widgets = self.create_widgets('action')
         for widget in self.action_widgets:
