@@ -76,7 +76,7 @@ class Person:
         if self.is_infected:
             prevention_measures = 1
             if self.is_masked:
-                prevention_measures *= rules['face mask efficacy']
+                prevention_measures *= rules['mask efficacy']
             
             self.infectivity = float(rules['virus infectivity'] * prevention_measures)
             return
@@ -100,7 +100,7 @@ class Person:
 
         prevention_measures = 1
         if self.is_masked:
-            prevention_measures *= rules['face mask efficacy']
+            prevention_measures *= rules['mask efficacy']
 
         if self.is_vaccinated:
             prevention_measures *= rules['vaccination efficacy']

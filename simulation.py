@@ -105,6 +105,9 @@ class Simulation:
             self.chk_masks = ttk.Checkbutton(self.tab_prevention, text='Masks')
             self.chk_masks.state(['!alternate'])
 
+            self.lbl_mask_usage = ttk.Label(self.tab_prevention, text='Mask usage (%)')
+            self.scale_mask_usage = tkinter.Scale(self.tab_prevention, from_=0, to=100, orient=tkinter.HORIZONTAL, length=200)
+
 
             settings_widgets = [
                 self.lbl_spn_num_people, self.entry_num_people,
@@ -119,7 +122,13 @@ class Simulation:
                 self.chk_vaccinations,
                 self.lbl_scale_vaccination_chance, self.scale_vaccination_chance,
                 self.chk_masks,
+                self.lbl_mask_usage, self.scale_mask_usage,
             ]
+
+            self.people_infected_widgets = {
+                self.entry_num_people, self.entry_number_of_infected
+            }
+            
             return settings_widgets
 
         if widget_type == 'action':
@@ -191,8 +200,10 @@ class Simulation:
                 
                 if rules['masks']:
                     for person in self.people:
-                        person.is_masked = True
-                else: 
+                        if random.randint(0, 100) <= rules['mask usage']:
+                            person.is_masked = True
+                        else: person.is_masked = False
+                else:
                     for person in self.people:
                         person.is_masked = False
 
@@ -283,6 +294,8 @@ class Simulation:
     def enable_options(self):
         for widget in self.settings_widgets:
             widget.config(state= 'normal')
+        for widget in self.people_infected_widgets:
+            widget.config(state= 'disabled')
 
     def validate_options(self):
         try:
@@ -370,6 +383,7 @@ class Simulation:
             if self.chk_masks.instate(['selected']):
                 rules['masks'] = True
             else: rules['masks'] = False
+            rules['mask usage'] = self.scale_mask_usage.get()
 
             total_people = int(self.entry_num_people.get())
             num_infected = int(self.entry_number_of_infected.get())
@@ -377,11 +391,17 @@ class Simulation:
 
             if self.initial_run:
                 for _ in range(0, num_healhty):
-                    person = Person(is_vaccinated=False, is_infected=False, is_masked=rules['masks'], rules=rules)
+                    masks = False
+                    if random.randint(1, 100) <= rules['mask usage']:
+                        masks = True
+                    person = Person(is_vaccinated=False, is_infected=False, is_masked=masks, rules=rules)
                     self.people.append(person)
                 
                 for _ in range(0, num_infected):
-                    person = Person(is_vaccinated=False, is_infected=True, is_masked=rules['masks'], rules=rules)
+                    masks = False
+                    if random.randint(1, 100) <= rules['mask usage']:
+                        masks = True
+                    person = Person(is_vaccinated=False, is_infected=True, is_masked=masks, rules=rules)
                     self.people.append(person)
 
                 self.btn_start['text'] = 'Continue'
