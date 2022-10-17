@@ -44,12 +44,6 @@ The number of locations in which the population can gather.
 ### Virus infectivity
 The basic infectivity of the disease. Higher numbers are more infectious.
 
-### Post-recovery immunity period
-The length of time for which a person who has recovered has immunity to re-infection.
-
-### Post-recovery immunity period variance
-The amount of randomness applied to the period of immunity granted after recovery.
-
 ### Infection duration
 The period for which in infected person stays infected.
 
@@ -58,6 +52,24 @@ The amount of randomness of the infection duration.
 
 ### Mortality rate
 The percentage of cases which will result in death.
+
+### Post-recovery immunity period
+The length of time for which a person who has recovered has immunity to re-infection.
+
+### Post-recovery immunity period variance
+The amount of randomness applied to the period of immunity granted after recovery.
+
+### Vaccinations
+Switches on/off vaccinations.
+
+### Daily vaccination chance (%)
+Determines how likely each unvaccinated person is to be vaccinated each day.
+
+### Masks
+Switches on/off mask usage.
+
+### Mask usage (%)
+Determines how many people will use a mask as a percentage of the population. This will also have some slight variance for realism.
 
 ### Days to simulate
 How many days to simulate. This can be changed and repeated to move in smaller or larger steps.
