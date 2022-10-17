@@ -19,7 +19,7 @@ class Simulation:
 
         tab_height, tab_width = 400, 400
 
-        self.WINDOW.geometry(f'{tab_width + 60}x{tab_height + 280}+800+300')
+        self.WINDOW.geometry(f'{tab_width + 200}x{tab_height + 280}+800+300')
 
         title = ttk.Label(self.WINDOW, text='Epidemic Simulator Settings', font=('Helvetica', 20), padding=10)
         title.pack()
@@ -31,6 +31,8 @@ class Simulation:
         self.tabs.add(self.tab_virus, text='Virus Settings')
         self.tab_prevention = ttk.Frame(self.tabs, width=tab_width, height=tab_height)
         self.tabs.add(self.tab_prevention, text='Prevention Settings')
+        self.tab_debug = ttk.Frame(self.tabs, width=tab_width, height=tab_height)
+        self.tabs.add(self.tab_debug, text='Simulation Debug')
 
         self.tabs.pack()
         
@@ -57,6 +59,11 @@ class Simulation:
         self.action_widgets = self.create_widgets('action')
         for widget in self.action_widgets:
             widget.pack(anchor=tkinter.S)
+
+        self.debug_widgets = self.create_widgets('debug')
+        for widget in self.debug_widgets:
+            widget.pack()
+
 
         self.initial_run = True
 
@@ -154,6 +161,15 @@ class Simulation:
             ]
             
             return action_widgets
+
+        if widget_type == 'debug':
+            self.txt_debug = tkinter.Text(self.tab_debug, state='disabled', height=self.tab_debug.cget('height'))
+
+            debug_widgets = [
+                self.txt_debug,
+            ]
+
+            return debug_widgets
     
     def interrupt(self):
         self.interrupt = True
@@ -271,9 +287,21 @@ class Simulation:
                 self.stats.total_vaccinated.append(total_vaccinated)
                 self.stats.total_dead.append(len(self.dead_people))
 
-                print(f'Day{len(self.stats.days)}: {total_infected}/{len(self.people) + len(self.dead_people)} are infected. {len(self.dead_people)} are dead.')
+                text = f'''Day{len(self.stats.days)}:
+                Total healthy {total_healhty_vulnerable + total_recovered + total_vaccinated}
+                Total vulnerable to infection: {total_healhty_vulnerable}
+                Total infected: {total_infected}
+                Total recovered: {total_infected}
+                Total dead: {total_dead}
+                Total Vaccinated: {total_vaccinated}
+                '''
+                # print(text)
 
+                self.update_debug_text(text)
                 self.WINDOW.update()
+            else: 
+                self.update_debug_text(f'Simulation reached 0 infected after {len(self.stats.days)} days.')
+                return
 
     def show_data(self):
         palette = ['#b52b2b', '#2b72b5', '#4dbf6d', '#e3fa95', '#000000']
@@ -298,6 +326,12 @@ class Simulation:
             widget.config(state= 'normal')
         for widget in self.people_infected_widgets:
             widget.config(state= 'disabled')
+
+    def update_debug_text(self, text):
+        self.txt_debug.configure(state='normal')
+        self.txt_debug.insert(tkinter.END, text + '\n')
+        self.txt_debug.see('end')
+        self.txt_debug.configure(state='disabled')
 
     def validate_options(self):
         try:
@@ -411,9 +445,10 @@ class Simulation:
                 self.entry_number_of_infected.config(state='disabled')
                 self.initial_run = False
 
-            days_to_sim = int(self.spn_days_to_sim.get())
+            self.tabs.select(self.tab_debug)
 
             self.disable_options()
+            days_to_sim = int(self.spn_days_to_sim.get())
             self.step(days_to_sim)
             self.enable_options()
 
