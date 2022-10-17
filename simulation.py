@@ -50,8 +50,7 @@ class Simulation:
         for widget in self.settings_widgets:
             if 'checkbutton' in str(widget):
                 widget.pack(pady=(0,widget_ypad))
-                break
-            if x == 1:
+            elif x == 1:
                 widget.pack()
                 x += 1
             elif x == 2:
