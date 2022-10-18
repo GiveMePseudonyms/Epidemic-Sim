@@ -24,9 +24,9 @@ class Location:
             if has_healthy is True and has_healthy is True:
                 for person in self.people: person.valid_location = True
                 self.valid = True
-                return
+                return True
                 
         for person in self.people: person.valid_location = False
 
         self.valid = False
-        return
+        return False
