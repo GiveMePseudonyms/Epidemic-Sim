@@ -293,7 +293,7 @@ class Simulation:
                 Total vulnerable to infection: {total_healhty_vulnerable}
                 Total infected: {total_infected}
                 Total recovered: {total_infected}
-                Total dead: {total_dead}
+                Total dead: {len(self.dead_people)}
                 Total Vaccinated: {total_vaccinated}
                 '''
                 # print(text)
