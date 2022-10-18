@@ -312,7 +312,7 @@ class Simulation:
                 return
 
     def show_data(self):
-        palette = ['#b52b2b', '#2b72b5', '#4dbf6d', '#e3fa95', '#000000']
+        palette = ['#d13434', '#2b72b5', '#1e8f3e', '#a8fa95', '#000000']
         plt.stackplot(1, 1)
         plt.clf()
         plt.stackplot(
