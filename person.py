@@ -82,11 +82,7 @@ class Person:
             return
     
     def calculate_susceptibility(self, rules):
-        if self.is_infected and self.days_since_infection <= self.infection_duration:
-            self.susceptibility = 0
-            return
-
-        if self.is_infected and self.days_since_infection > self.infection_duration:
+        if self.is_infected:
             self.susceptibility = 0
             return
 

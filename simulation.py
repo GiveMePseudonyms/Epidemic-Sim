@@ -4,14 +4,20 @@ from tkinter import messagebox
 import matplotlib.pyplot as plt
 from person import Person
 from location import Location
+import random
 from random import randint, uniform
 from ruleset import rules
 from dataobject import DataObject
 import time
-from threading import Thread
+import cProfile, pstats
 
 class Simulation:
     def __init__(self):
+        
+        ################
+        self.profiling = False
+        ################
+        
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
         self.WINDOW.resizable(False, False)
@@ -217,12 +223,16 @@ class Simulation:
                 if rules['vaccinations']:
                     for person in self.people:
                         if not person.is_infected and not person.is_vaccinated:
-                            if randint(0, 1000) <= (rules['vaccination chance'] * 10):
+                            #if randint(0, 1000) <= (rules['vaccination chance'] * 10):
+                            # This method is quite a lot faster than using randint
+                            if (int(999 * random.random())+1) <= (rules['vaccination chance'] * 10):
                                 person.vaccinate()
                 
                 if rules['masks']:
                     for person in self.people:
-                        if randint(0, 100) <= rules['mask usage']:
+                        #if randint(0, 100) <= rules['mask usage']:
+                        # This method is quite a lot faster than using randint
+                        if (int(99* random.random())+1) <= rules['mask usage']:
                             person.is_masked = True
                         else: person.is_masked = False
                 else:
@@ -231,19 +241,15 @@ class Simulation:
 
                 num_locations = rules['number of locations']
                 locations_list = [Location() for x in range(0, num_locations)]
-  
+
                 for person in self.people:
-                    location_index = randint(0, num_locations -1)
+                    #location_index = randint(0, num_locations -1)
+                    #Much faster than randint
+                    location_index = (int((num_locations-1)* random.random()))
                     locations_list[location_index].add_person(person)
                     person.location = location_index
 
-                self.valid_locations = []
-
-                for location in locations_list:
-                    # a location is NOT valid is all people in it are infected or all people in it are healthy, 
-                    # since the outcome is deterministic in those cases
-                    location.check_if_valid()
-                self.valid_locations = [location for location in locations_list if location.valid]
+                self.valid_locations = [location for location in locations_list if location.check_if_valid()]
 
                 for person in self.people:
                     if person.valid_location:
@@ -261,13 +267,14 @@ class Simulation:
                     for person in location.people:
                         if person.susceptibility > 0:
                             chance_of_infection = self.calculate_chance_of_infection(person, location)
-                            rnd = uniform(1, 100)
-                            if rnd <= chance_of_infection:
+                            #rnd = uniform(1, 100)
+                            #much faster than uniform
+                            if (100* random.random()) <= chance_of_infection:
                                 person.infect(rules)
                         else: pass
-                    
+
                 total_infected, total_healhty_vulnerable, total_vaccinated, total_recovered, total_dead = 0, 0, 0, 0, 0
-                
+
                 for person in self.people:
                     if person.is_infected and not person.is_dead:
                         total_infected += 1
@@ -292,7 +299,7 @@ class Simulation:
                 Total healthy {total_healhty_vulnerable + total_recovered + total_vaccinated}
                 Total vulnerable to infection: {total_healhty_vulnerable}
                 Total infected: {total_infected}
-                Total recovered: {total_infected}
+                Total recovered: {total_recovered}
                 Total dead: {len(self.dead_people)}
                 Total Vaccinated: {total_vaccinated}
                 '''
@@ -358,7 +365,7 @@ class Simulation:
         except Exception as exc:
             self.throw_exception(exc, 'Number of locations spinner.', 'Please enter an integer.')
             return False
-        
+
         try:
             days_to_sim = int(self.spn_days_to_sim.get())
         except Exception as exc:
@@ -450,9 +457,14 @@ class Simulation:
 
             self.disable_options()
             days_to_sim = int(self.spn_days_to_sim.get())
-            self.step(days_to_sim)
+            if self.profiling:
+                with cProfile.Profile() as cprof:
+                    self.step(days_to_sim)
+                stats = pstats.Stats(cprof)
+                stats.sort_stats(pstats.SortKey.TIME)
+                stats.print_stats()
+            else: self.step(days_to_sim)
             self.enable_options()
-
             self.show_data()
 
 if __name__ == '__main__':
