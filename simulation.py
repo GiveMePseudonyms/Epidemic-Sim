@@ -9,12 +9,15 @@ from random import randint, uniform
 from ruleset import rules
 from dataobject import DataObject
 import time
-from threading import Thread, Lock
-import cProfile
-import pstats
+import cProfile, pstats
 
 class Simulation:
     def __init__(self):
+        
+        ################
+        self.profiling = False
+        ################
+        
         self.WINDOW = tkinter.Tk()
         self.WINDOW.title('Simulation')
         self.WINDOW.resizable(False, False)
@@ -266,13 +269,12 @@ class Simulation:
                             chance_of_infection = self.calculate_chance_of_infection(person, location)
                             #rnd = uniform(1, 100)
                             #much faster than uniform
-                            rnd = (100* random.random())
-                            if rnd <= chance_of_infection:
+                            if (100* random.random()) <= chance_of_infection:
                                 person.infect(rules)
                         else: pass
-                    
+
                 total_infected, total_healhty_vulnerable, total_vaccinated, total_recovered, total_dead = 0, 0, 0, 0, 0
-                
+
                 for person in self.people:
                     if person.is_infected and not person.is_dead:
                         total_infected += 1
@@ -363,7 +365,7 @@ class Simulation:
         except Exception as exc:
             self.throw_exception(exc, 'Number of locations spinner.', 'Please enter an integer.')
             return False
-        
+
         try:
             days_to_sim = int(self.spn_days_to_sim.get())
         except Exception as exc:
@@ -455,13 +457,14 @@ class Simulation:
 
             self.disable_options()
             days_to_sim = int(self.spn_days_to_sim.get())
-            with cProfile.Profile() as cprof:
-                self.step(days_to_sim)
-            stats = pstats.Stats(cprof)
-            stats.sort_stats(pstats.SortKey.TIME)
-            stats.print_stats()
+            if self.profiling:
+                with cProfile.Profile() as cprof:
+                    self.step(days_to_sim)
+                stats = pstats.Stats(cprof)
+                stats.sort_stats(pstats.SortKey.TIME)
+                stats.print_stats()
+            else: self.step(days_to_sim)
             self.enable_options()
-
             self.show_data()
 
 if __name__ == '__main__':
