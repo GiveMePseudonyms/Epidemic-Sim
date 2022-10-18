@@ -292,7 +292,7 @@ class Simulation:
                 Total healthy {total_healhty_vulnerable + total_recovered + total_vaccinated}
                 Total vulnerable to infection: {total_healhty_vulnerable}
                 Total infected: {total_infected}
-                Total recovered: {total_infected}
+                Total recovered: {total_recovered}
                 Total dead: {total_dead}
                 Total Vaccinated: {total_vaccinated}
                 '''
