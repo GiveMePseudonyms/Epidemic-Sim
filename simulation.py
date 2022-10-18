@@ -9,6 +9,8 @@ from ruleset import rules
 from dataobject import DataObject
 import time
 from threading import Thread
+import cProfile
+import pstats
 
 class Simulation:
     def __init__(self):
@@ -293,7 +295,7 @@ class Simulation:
                 Total vulnerable to infection: {total_healhty_vulnerable}
                 Total infected: {total_infected}
                 Total recovered: {total_recovered}
-                Total dead: {total_dead}
+                Total dead: {len(self.dead_people)}
                 Total Vaccinated: {total_vaccinated}
                 '''
                 # print(text)
@@ -450,7 +452,11 @@ class Simulation:
 
             self.disable_options()
             days_to_sim = int(self.spn_days_to_sim.get())
-            self.step(days_to_sim)
+            with cProfile.Profile() as prof:
+                self.step(days_to_sim)
+            stats = pstats.Stats(prof)
+            stats.sort_stats(pstats.SortKey.TIME)
+            stats.print_stats()
             self.enable_options()
 
             self.show_data()
