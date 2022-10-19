@@ -1,7 +1,7 @@
 # Epidemic-Sim
 An agent-based model designed to model epidemics with varying degrees of infectivity, lethality, vaccination rates, mask-wearing, hand-washing. Written in Python. Started Oct 2022.
 
-<img width="1328" alt="image" src="https://user-images.githubusercontent.com/113452530/196223016-8bac09d3-06e3-4696-b8e1-c464c648516a.png">
+<img width="1768" alt="image" src="https://user-images.githubusercontent.com/113452530/196677953-239d4e82-b489-47bb-a363-53f8aea1b36d.png">
 
 ```
 200,000 people, 10 starting infected.
@@ -9,8 +9,8 @@ Virus infectivity: 18
 Infection duration: 14 ± 4 days
 Mortality rate: 14%
 Post-recovery immunity period: 25 ± 5 days
-Vaccinations started at 300 days at 1% per day at 95% efficacy
-Mask usage ~29% at 50% efficacy
+Vaccinations started at 150 days at 1% per day at 95% efficacy
+Mask usage started at 100 days, adherence at ~29% at 50% efficacy
 ```
 
 <img width="712" alt="image" src="https://user-images.githubusercontent.com/113452530/196223799-42de0e2a-1648-45fb-82ae-d93f5ddfd2dd.png">
