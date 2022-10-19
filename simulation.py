@@ -309,9 +309,14 @@ class Simulation:
                 self.WINDOW.update()
             else: 
                 self.update_debug_text(f'Simulation reached 0 infected after {len(self.stats.days)} days.')
-                return
+                break
 
     def show_data(self):
+        vac_label_offset = 0.1
+        mask_label_offset = 0.2
+        totalheight = len(self.people) + len(self.dead_people)
+        arrow_font_size = 8
+
         palette = ['#d13434', '#2b72b5', '#1e8f3e', '#a8fa95', '#000000']
         plt.stackplot(1, 1)
         plt.clf()
@@ -321,6 +326,27 @@ class Simulation:
             self.stats.total_recovered, self.stats.total_dead,
             labels=['Total Infected', 'Total Healthy & Vulerable', 'Total Vaccinated', 'Total Recovered Immune', 'Total Dead'],
             colors=palette)
+        
+        for datapoint in self.stats.vac_enabled:
+            #plt.annotate('Vaccines Enabled', (datapoint, vac_label_offset * (len(self.people) + len(self.dead_people))))
+            plt.text(datapoint, vac_label_offset * totalheight, 'Vaccines Enabled', 
+                    ha='right', va='center', size=arrow_font_size, bbox=dict(boxstyle='rarrow,pad=0.3', fc='white', ec='g', lw=2 ))
+        
+        for datapoint in self.stats.vac_disabled:
+            #plt.annotate('Vaccines Disabled', (datapoint, vac_label_offset * (len(self.people) + len(self.dead_people))))
+            plt.text(datapoint, vac_label_offset * totalheight, 'Vaccines Disabled', 
+                    ha='right', va='center', size=arrow_font_size, bbox=dict(boxstyle='rarrow,pad=0.3', fc='white', ec='g', lw=2 ))
+
+        for datapoint in self.stats.masks_enabled:
+            #plt.annotate('Masks enabled', (datapoint, mask_label_offset * (len(self.people) + len(self.dead_people))))
+            plt.text(datapoint, mask_label_offset * totalheight, 'Masks Enabled', 
+                    ha='right', va='center', size=arrow_font_size, bbox=dict(boxstyle='rarrow,pad=0.3', fc='white', ec='b', lw=2 ))
+
+        for datapoint in self.stats.masks_disabled:
+            #plt.annotate('Masks disabled', (datapoint, mask_label_offset * (len(self.people) + len(self.dead_people))))
+            plt.text(datapoint, mask_label_offset * totalheight, 'Masks Disabled', 
+                    ha='right', va='center', size=arrow_font_size, bbox=dict(boxstyle='rarrow,pad=0.3', fc='white', ec='b', lw=2 ))
+
         plt.title('Epidemic Sim')
         plt.legend(loc='upper left')
         plt.show()
@@ -420,13 +446,27 @@ class Simulation:
             rules['post-recovery immunity period'] = int(self.entry_post_recovery_immunity_period.get())
             rules['post-recovery immunity period variance'] = int(self.spn_post_recovery_immunity_period_variance.get())
             rules['mortality %'] = int(self.scale_mortality_rate.get())
+
             if self.chk_vaccinations.instate(['selected']):
+                if not rules['vaccinations']:
+                    self.stats.vac_enabled.append(len(self.stats.days))
                 rules['vaccinations'] = True
-            else: rules['vaccinations'] = False
+            else: 
+                if rules['vaccinations']:
+                    self.stats.vac_disabled.append(len(self.stats.days))
+                rules['vaccinations'] = False
+
             rules['vaccination chance'] = int(self.scale_vaccination_chance.get())
+            
             if self.chk_masks.instate(['selected']):
+                if not rules['masks']:
+                    self.stats.masks_enabled.append(len(self.stats.days))
                 rules['masks'] = True
-            else: rules['masks'] = False
+            else:
+                if rules['masks']:
+                    self.stats.masks_disabled.append(len(self.stats.days))
+                rules['masks'] = False
+            
             rules['mask usage'] = self.scale_mask_usage.get()
 
             total_people = int(self.entry_num_people.get())
@@ -465,6 +505,7 @@ class Simulation:
                 stats.print_stats()
             else: self.step(days_to_sim)
             self.enable_options()
+            
             self.show_data()
 
 if __name__ == '__main__':
