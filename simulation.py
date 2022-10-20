@@ -309,9 +309,6 @@ class Simulation:
                 Total recovered: {total_recovered}
                 Total dead: {len(self.dead_people)}
                 Total Vaccinated: {total_vaccinated}
-
-                people + dead = {len(self.people) + len(self.dead_people)}
-                total = {total_healhty_vulnerable + total_infected + total_recovered + total_vaccinated + len(self.dead_people)}
                 '''
                 # print(text)
 
