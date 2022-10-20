@@ -58,8 +58,8 @@ class Person:
 
         recovery_immunity_period = randint(rule_post_recovery_immunity_period - rule_post_recovery_immunity_period_variance,
                                                     rule_post_recovery_immunity_period + rule_post_recovery_immunity_period_variance)
-        
-        while recovery_immunity_period <=0:
+
+        while recovery_immunity_period <0:
                 recovery_immunity_period = randint(rule_post_recovery_immunity_period - rule_post_recovery_immunity_period_variance,
                                                             rule_post_recovery_immunity_period + rule_post_recovery_immunity_period_variance)
 
@@ -67,6 +67,8 @@ class Person:
 
     def die(self):
         self.is_dead = True
+        self.is_infected = False
+        self.is_recovered = False
 
     def calculate_infectivity(self, rules):
         if not self.is_infected:
@@ -104,26 +106,27 @@ class Person:
         self.susceptibility = float(rules['virus infectivity'] * prevention_measures)
 
     def progress_infection(self, rules):
-        if self.is_infected and self.days_since_infection <= self.infection_duration:
+        if self.is_infected and self.days_since_infection < self.infection_duration:
             self.days_since_infection += 1
             self.susceptibility = 0
             return
 
-        if self.is_infected and self.days_since_infection > self.infection_duration:
+        if self.is_infected and self.days_since_infection == self.infection_duration:
             if randint(1, 100) <= rules['mortality %']:
                 self.die()
+                self.susceptibility = 0
                 return
             else:
                 self.recover(rules)
                 self.susceptibility = 0
                 return
 
-        if self.is_recovered and self.days_since_recovery <= self.recovery_immunity_period:
+        if self.is_recovered and self.days_since_recovery < self.recovery_immunity_period:
             self.days_since_recovery += 1
             self.susceptibility = 0
             return
 
-        if self.is_recovered and self.days_since_recovery > self.recovery_immunity_period:
+        if self.is_recovered and self.days_since_recovery == self.recovery_immunity_period:
             self.days_since_recovery = 0
             self.is_recovered = False
 

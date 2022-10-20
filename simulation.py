@@ -213,7 +213,7 @@ class Simulation:
             if self.interrupt:
                 self.interrupt = False
                 return
-            
+
             total_infected = 0
             for person in self.people:
                 if person.is_infected:
@@ -227,7 +227,7 @@ class Simulation:
                             # This method is quite a lot faster than using randint
                             if (int(999 * random.random())+1) <= (rules['vaccination chance'] * 10):
                                 person.vaccinate()
-                
+
                 if rules['masks']:
                     for person in self.people:
                         #if randint(0, 100) <= rules['mask usage']:
@@ -252,13 +252,18 @@ class Simulation:
                 self.valid_locations = [location for location in locations_list if location.check_if_valid()]
 
                 for person in self.people:
-                    if person.valid_location:
-                        person.calculate_infectivity(rules)
-                        person.calculate_susceptibility(rules)
-                        person.progress_infection(rules)
-                    else:
-                        if person.is_infected:
-                            person.progress_infection(rules)
+                    person.calculate_infectivity(rules)
+                    person.calculate_susceptibility(rules)
+                    person.progress_infection(rules)
+                
+                #for person in self.people:
+                 #   if person.valid_location:
+                  #      person.calculate_infectivity(rules)
+                   #     person.calculate_susceptibility(rules)
+                    #    person.progress_infection(rules)
+                    #else:
+                     #   if person.is_infected:
+                      #      person.progress_infection(rules)
 
                 for location in self.valid_locations:
                         location.calculate_infectivity()
@@ -276,17 +281,19 @@ class Simulation:
                 total_infected, total_healhty_vulnerable, total_vaccinated, total_recovered, total_dead = 0, 0, 0, 0, 0
 
                 for person in self.people:
-                    if person.is_infected and not person.is_dead:
-                        total_infected += 1
-                    if not person.is_infected and not person.is_recovered and not person.is_dead and not person.is_vaccinated:
-                        total_healhty_vulnerable += 1
-                    if person.is_recovered and not person.is_dead and not person.is_vaccinated:
-                        total_recovered += 1
-                    if person.is_vaccinated and not person.is_dead and not person.is_infected:
-                        total_vaccinated += 1
                     if person.is_dead:
                         self.people.remove(person)
                         self.dead_people.append(person)
+
+                for person in self.people:
+                    if person.is_infected:
+                        total_infected += 1
+                    elif person.is_recovered and not person.is_vaccinated:
+                        total_recovered += 1
+                    elif person.is_vaccinated and not person.is_dead and not person.is_infected:
+                        total_vaccinated += 1
+                    elif not person.is_infected and not person.is_recovered and not person.is_dead and not person.is_vaccinated:
+                        total_healhty_vulnerable += 1
 
                 self.stats.days.append(len(self.stats.days))
                 self.stats.total_healthy_vulnerable.append(total_healhty_vulnerable)
@@ -302,6 +309,9 @@ class Simulation:
                 Total recovered: {total_recovered}
                 Total dead: {len(self.dead_people)}
                 Total Vaccinated: {total_vaccinated}
+
+                people + dead = {len(self.people) + len(self.dead_people)}
+                total = {total_healhty_vulnerable + total_infected + total_recovered + total_vaccinated + len(self.dead_people)}
                 '''
                 # print(text)
 
