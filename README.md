@@ -1,10 +1,10 @@
 # Epidemic-Sim
 An agent-based model designed to model epidemics with varying degrees of infectivity, lethality, vaccination rates, mask-wearing, hand-washing. Written in Python. Started Oct 2022.
 
-<img width="1768" alt="image" src="https://user-images.githubusercontent.com/113452530/196677953-239d4e82-b489-47bb-a363-53f8aea1b36d.png">
+<img width="1726" alt="image" src="https://user-images.githubusercontent.com/113452530/196970325-a61e6827-bb27-43e0-9ccb-55afec25e963.png">
 
 ```
-200,000 people, 10 starting infected.
+100,000 people, 10 starting infected.
 Virus infectivity: 18
 Infection duration: 14 ± 4 days
 Mortality rate: 14%
