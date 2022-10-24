@@ -17,6 +17,7 @@ Mask usage started at 100 days, adherence at ~29% at 50% efficacy
 
 ## How to run
 Get Python: https://www.python.org/downloads/
+
 Download the repo into a single folder, open a terminal in that folder, then type:
 ```
 pip3 install requirements.txt
