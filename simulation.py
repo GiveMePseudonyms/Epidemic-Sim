@@ -22,8 +22,6 @@ class Simulation:
         self.WINDOW.title('Simulation')
         self.WINDOW.resizable(False, False)
 
-        padx, pady = 20, 20
-
         tab_height, tab_width = 400, 400
 
         self.WINDOW.geometry(f'{tab_width + 200}x{tab_height + 280}+800+300')
@@ -70,7 +68,6 @@ class Simulation:
         self.debug_widgets = self.create_widgets('debug')
         for widget in self.debug_widgets:
             widget.pack()
-
 
         self.initial_run = True
 
@@ -254,16 +251,7 @@ class Simulation:
                 for person in self.people:
                     person.calculate_infectivity(rules)
                     person.calculate_susceptibility(rules)
-                    person.progress_infection(rules)
-                
-                #for person in self.people:
-                 #   if person.valid_location:
-                  #      person.calculate_infectivity(rules)
-                   #     person.calculate_susceptibility(rules)
-                    #    person.progress_infection(rules)
-                    #else:
-                     #   if person.is_infected:
-                      #      person.progress_infection(rules)
+                    person.progress_infection(rules)       
 
                 for location in self.valid_locations:
                         location.calculate_infectivity()
@@ -335,22 +323,18 @@ class Simulation:
             colors=palette)
         
         for datapoint in self.stats.vac_enabled:
-            #plt.annotate('Vaccines Enabled', (datapoint, vac_label_offset * (len(self.people) + len(self.dead_people))))
             plt.text(datapoint, vac_label_offset * totalheight, 'Vaccines Enabled', 
                     ha='right', va='center', size=arrow_font_size, bbox=dict(boxstyle='rarrow,pad=0.3', fc='white', ec='g', lw=2 ))
         
         for datapoint in self.stats.vac_disabled:
-            #plt.annotate('Vaccines Disabled', (datapoint, vac_label_offset * (len(self.people) + len(self.dead_people))))
             plt.text(datapoint, vac_label_offset * totalheight, 'Vaccines Disabled', 
                     ha='right', va='center', size=arrow_font_size, bbox=dict(boxstyle='rarrow,pad=0.3', fc='white', ec='g', lw=2 ))
 
         for datapoint in self.stats.masks_enabled:
-            #plt.annotate('Masks enabled', (datapoint, mask_label_offset * (len(self.people) + len(self.dead_people))))
             plt.text(datapoint, mask_label_offset * totalheight, 'Masks Enabled', 
                     ha='right', va='center', size=arrow_font_size, bbox=dict(boxstyle='rarrow,pad=0.3', fc='white', ec='b', lw=2 ))
 
         for datapoint in self.stats.masks_disabled:
-            #plt.annotate('Masks disabled', (datapoint, mask_label_offset * (len(self.people) + len(self.dead_people))))
             plt.text(datapoint, mask_label_offset * totalheight, 'Masks Disabled', 
                     ha='right', va='center', size=arrow_font_size, bbox=dict(boxstyle='rarrow,pad=0.3', fc='white', ec='b', lw=2 ))
 
