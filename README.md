@@ -16,6 +16,8 @@ Mask usage started at 100 days, adherence at ~29% at 50% efficacy
 <img width="712" alt="image" src="https://user-images.githubusercontent.com/113452530/196223799-42de0e2a-1648-45fb-82ae-d93f5ddfd2dd.png">
 
 ## How to run
+Get Python: https://www.python.org/downloads/
+
 Download the repo into a single folder, open a terminal in that folder, then type:
 ```
 pip3 install requirements.txt
@@ -93,4 +95,4 @@ Below is a list of papers I have used to determine the efficacy of given prevent
 
 ## Limitations
 - The real world is chaotic and extremely difficult to accurately model. This model should be used for demonstration purposes.
-- This package is computationally expensive and where fast simulation times are important, has a maximum population size of approximately 100,000 and no more than 300,000. Larger populations significantly slow down the model. There are various code improvements that can increase the speed of the model which will be regularly tested and applied. The popultion list will be pruned to remove dead people, which will speed up the processing for a disease which has killed many people over time.
+- This package is computationally expensive and where fast simulation times are important, has a maximum fast population size of approximately 100,000 and no more than 300,000. Larger populations significantly slow down the model, but there is no upper limit on the population size. There are various code improvements that can increase the speed of the model which will be regularly tested and applied. The popultion list will be pruned to remove dead people, which will speed up the processing for a disease which has killed many people over time.
